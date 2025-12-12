@@ -10,6 +10,10 @@ export const organizations = pgTable('organizations', {
   updated_at: timestamp('updated_at').defaultNow().notNull()
 });
 
+export type Organization = typeof organizations.$inferSelect;
+export type NewOrganization = typeof organizations.$inferInsert;
+export type UpdateOrganization = Partial<NewOrganization>;
+
 // users (linked to supabase auth)
 export const users = pgTable('users', {
   id: uuid('id').defaultRandom().primaryKey(),
