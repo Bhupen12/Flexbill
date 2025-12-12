@@ -1,5 +1,5 @@
 export type {
-  Organization,
-  NewOrganization,
-  UpdateOrganization
-} from "$lib/server/db/schema";
+  OrganizationInsert,
+  OrganizationSelect,
+  OrganizationUpdate
+} from '$lib/server/validation/organizations'

@@ -1,32 +1,79 @@
 import { db } from "$lib/server/db";
 import { organizations } from "$lib/server/db/schema";
-import type { UpdateOrganization } from "$lib/types/db";
 import type { RequestHandler } from "@sveltejs/kit";
 import { eq } from "drizzle-orm";
 
+import {
+  type OrganizationUpdate,
+  organizationSelectSchema,
+  organizationUpdateSchema
+} from "$lib/server/validation/organizations";
+
+const respond = (data: unknown, status = 200) =>
+  new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json" }
+  });
+
+export const GET: RequestHandler = async ({ params }) => {
+  const id = params.id;
+  if (!id) return respond({ error: "Organization ID is required" }, 400);
+
+  const rows = await db
+    .select()
+    .from(organizations)
+    .where(eq(organizations.id, id));
+
+  if (rows.length === 0) {
+    return respond({ error: "Organization not found" }, 404);
+  }
+
+  const parsed = organizationSelectSchema.parse(rows[0]);
+
+  return respond(parsed, 200);
+};
+
+
 export const PUT: RequestHandler = async ({ request, params }) => {
   const id = params.id;
-  if (!id) {
-    return new Response("Organization ID is required", { status: 400 });
+  if (!id) return respond({ error: "Organization ID is required" }, 400);
+
+  let json: OrganizationUpdate;
+
+  try {
+    json = await request.json();
+  } catch {
+    return respond({ error: "Invalid JSON body" }, 400);
   }
-  const data: UpdateOrganization = await request.json();
-  
-  const result = await db.update(organizations)
+
+  const data = organizationUpdateSchema.partial().parse(json);
+
+  const updated = await db
+    .update(organizations)
     .set(data)
     .where(eq(organizations.id, id))
     .returning();
 
-  return new Response(JSON.stringify(result), { status: 200 });
-}
+  if (updated.length === 0) {
+    return respond({ error: "Organization not found" }, 404);
+  }
+
+  return respond(updated[0], 200);
+};
+
 
 export const DELETE: RequestHandler = async ({ params }) => {
   const id = params.id;
-  if (!id) {
-    return new Response("Organization ID is required", { status: 400 });
-  }
+  if (!id) return respond({ error: "Organization ID is required" }, 400);
 
-  const result = await db.delete(organizations)
+  const deleted = await db
+    .delete(organizations)
     .where(eq(organizations.id, id))
     .returning();
-  return new Response(JSON.stringify(result), { status: 200 });
-}
+
+  if (deleted.length === 0) {
+    return respond({ error: "Organization not found" }, 404);
+  }
+
+  return respond({ message: "Deleted successfully", deleted: deleted[0] }, 200);
+};
