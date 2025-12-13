@@ -36,22 +36,24 @@
 		{#each items as group, index (group.title)}
 			<Sidebar.Group id={group.title}>
 				<Sidebar.GroupContent>
-					{#each group.items as item}
-						<Sidebar.MenuItem id={item.title}>
-							<Sidebar.MenuButton
-								tooltipContent={item.title}
-								isActive={isActiveRoute(item.url)}
-								class="gap-x-4 h-10 px-4"
-							>
-								{#snippet child({ props })}
-									<a href={item.url} {...props} data-sveltekit-preload-data="hover">
-										<item.icon class="size-4" />
-										<span>{item.title}</span>
-									</a>
-								{/snippet}
-							</Sidebar.MenuButton>
-						</Sidebar.MenuItem>
-					{/each}
+					<Sidebar.Menu>
+						{#each group.items as item}
+							<Sidebar.MenuItem id={item.title}>
+								<Sidebar.MenuButton
+									tooltipContent={item.title}
+									isActive={isActiveRoute(item.url)}
+									class="gap-x-4 h-10 px-4"
+								>
+									{#snippet child({ props })}
+										<a href={item.url} {...props} data-sveltekit-preload-data="hover">
+											<item.icon class="size-4" />
+											<span>{item.title}</span>
+										</a>
+									{/snippet}
+								</Sidebar.MenuButton>
+							</Sidebar.MenuItem>
+						{/each}
+					</Sidebar.Menu>
 				</Sidebar.GroupContent>
 			</Sidebar.Group>
 		{/each}
