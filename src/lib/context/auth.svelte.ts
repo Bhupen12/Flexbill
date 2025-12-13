@@ -1,6 +1,6 @@
 import { getContext, setContext } from 'svelte';
 
-import type { Role } from '$lib/types/auth';
+import type { Role } from '$lib/types';
 
 const AUTH_CTX = Symbol('AUTH_CTX');
 

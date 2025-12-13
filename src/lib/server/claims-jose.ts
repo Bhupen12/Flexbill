@@ -1,7 +1,7 @@
 import * as jose from 'jose';
 
 import { JWT_SECRET } from '$env/static/private';
-import type { ClaimType } from '$lib/types/auth';
+import type { ClaimType } from '$lib/types';
 
 const secret = jose.base64url.decode(JWT_SECRET)
 

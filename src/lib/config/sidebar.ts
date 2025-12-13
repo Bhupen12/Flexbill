@@ -1,4 +1,4 @@
-import { ROLES } from '$lib/types/auth';
+import { ROLES } from '$lib/types';
 import { 
   Building2Icon, 
   ReceiptIcon, 

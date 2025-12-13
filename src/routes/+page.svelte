@@ -11,7 +11,7 @@
 	} from '$lib/components/ui/card';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
-	import { ROLES } from '$lib/types/auth';
+	import { ROLES } from '$lib/types';
 	import { Loader2 } from '@lucide/svelte';
 
 	let userEmail = '';

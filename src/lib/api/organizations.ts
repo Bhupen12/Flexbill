@@ -1,4 +1,4 @@
-import type { OrganizationInsert, OrganizationSelect, OrganizationUpdate } from "$lib/types/db";
+import type { OrganizationInsert, OrganizationSelect, OrganizationUpdate } from "$lib/types";
 import { apiFetch } from "./client";
 
 const base = '/api/organizations';

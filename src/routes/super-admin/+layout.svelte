@@ -2,7 +2,7 @@
 	import AppSidebar from '$lib/components/custom/app-sidebar.svelte';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import { setAuthContext } from '$lib/context/auth.svelte';
-	import { ROLES } from '$lib/types/auth';
+	import { ROLES } from '$lib/types';
 
 	let { children } = $props();
 	setAuthContext({
