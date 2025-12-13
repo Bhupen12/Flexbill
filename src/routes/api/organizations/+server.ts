@@ -10,6 +10,7 @@ import {
 
 export const GET: RequestHandler = async () => {
   const result = await db.select().from(organizations);
+  console.log(result)
   const parsed = organizationSelectSchema.array().parse(result);
   return new Response(JSON.stringify(parsed), { status: 200 });
 }

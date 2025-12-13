@@ -1,5 +1,5 @@
 <script lang="ts">
-	import AppSidebar from '$lib/components/custom/app-sidebar.svelte';
+	import AppSidebar from '$lib/components/custom/shared/app-sidebar.svelte';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import { setAuthContext } from '$lib/context/auth.svelte';
 	import { ROLES } from '$lib/types';
@@ -14,7 +14,7 @@
 
 <Sidebar.Provider>
 	<AppSidebar />
-	<main>
+	<main class="w-full">
 		<Sidebar.Trigger />
 		{@render children?.()}
 	</main>
