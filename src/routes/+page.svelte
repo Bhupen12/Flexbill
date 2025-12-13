@@ -11,7 +11,6 @@
 	} from '$lib/components/ui/card';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
-	import { currentUser } from '$lib/stores/user.store';
 	import { ROLES } from '$lib/types/auth';
 	import { Loader2 } from '@lucide/svelte';
 
@@ -28,17 +27,6 @@
 
 	async function handleFormSubmit(event: Event) {
 		event.preventDefault();
-		// currentUser.set({
-		// 	id: '1',
-		// 	email: userEmail,
-		// 	role: ROLES.SUPER_ADMIN
-		// });
-		// // console.log(currentUser);
-		// $currentUser = {
-		// 	id: '1',
-		// 	email: userEmail,
-		// 	role: ROLES.SUPER_ADMIN
-		// };
 		goto('/super-admin');
 
 		// if (!userEmail || !userPassword) {
