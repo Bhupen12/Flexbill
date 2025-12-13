@@ -10,7 +10,7 @@
   const items = SIDEBAR_BY_ROLE[role] ?? [];
 
   function logout() {
-    goto('/login');
+    goto('/');
   }
 </script>
 
