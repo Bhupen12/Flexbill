@@ -14,8 +14,10 @@
 
 <Sidebar.Provider>
 	<AppSidebar />
-	<main class="w-full">
-		<Sidebar.Trigger />
-		{@render children?.()}
-	</main>
+	<Sidebar.Inset class="bg-accent/70">
+		<main>
+			<Sidebar.Trigger />
+			{@render children?.()}
+		</main>
+	</Sidebar.Inset>
 </Sidebar.Provider>
