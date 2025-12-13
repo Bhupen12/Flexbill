@@ -8,7 +8,7 @@
 
 	const { role } = useAuth();
 
-	const items = SIDEBAR_BY_ROLE[role] ?? [];
+	const items = $derived(SIDEBAR_BY_ROLE[role] ?? []);
 
 	function logout() {
 		goto('/');
@@ -24,7 +24,7 @@
 		<Sidebar.MenuItem>
 			<Sidebar.MenuButton class="gap-x-4 h-10 px-4">
 				{#snippet child({ props })}
-					<a href="/Home" data-sveltekit-preload-data="hover" class="flex">
+					<a href="/" data-sveltekit-preload-data="hover" class="flex">
 						<ReceiptIcon />
 						<span class="font-semibold text-sm">Flex Bill</span>
 					</a>

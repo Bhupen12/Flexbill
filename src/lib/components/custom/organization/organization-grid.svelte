@@ -34,13 +34,17 @@
 		});
 	}
 
-	function handleSubmit(e: Event) {
+	async function handleSubmit(e: Event) {
 		e.preventDefault();
 		if (newName.trim()) {
-			onAdd(newName.trim(), newCode.trim());
-			newName = '';
-			newCode = '';
-			dialogOpen = false;
+			try {
+				await onAdd(newName.trim(), newCode.trim());
+				newName = '';
+				newCode = '';
+				dialogOpen = false;
+			} catch (error) {
+				// Handle error (show toast, set error state, etc.)
+			}
 		}
 	}
 

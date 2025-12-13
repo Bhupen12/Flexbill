@@ -11,7 +11,6 @@
 	} from '$lib/components/ui/card';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
-	import { ROLES } from '$lib/types';
 	import { Loader2 } from '@lucide/svelte';
 
 	let userEmail = '';
@@ -46,7 +45,7 @@
 	<Card class="w-full max-w-sm shadow-lg">
 		<CardHeader class="space-y-1">
 			<CardTitle class="text-2xl font-bold">Login</CardTitle>
-			<CardDescription>Enter your valid credintials</CardDescription>
+			<CardDescription>Enter your valid credentials</CardDescription>
 		</CardHeader>
 
 		<CardContent class="grid gap-4">

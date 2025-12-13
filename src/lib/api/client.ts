@@ -13,7 +13,14 @@ export async function apiFetch<T>(
   const data = await res.json();
 
   if (!res.ok) {
-    throw new Error(data.message || 'API request failed');
+    let errorMessage = 'API request failed';
+    try {
+      const data = await res.json();
+      errorMessage = data.message || errorMessage;
+    } catch {
+      // Ignore JSON parsing errors
+    }
+    throw new Error(errorMessage);
   }
 
   return data as T;

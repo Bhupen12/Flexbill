@@ -46,11 +46,12 @@ export const PUT: RequestHandler = async ({ request, params }) => {
     return respond({ error: "Invalid JSON body" }, 400);
   }
 
-  const data = organizationUpdateSchema.partial().parse(json);
+  const data = organizationUpdateSchema.parse(json);
 
+  const now = new Date();
   const updated = await db
     .update(organizations)
-    .set(data)
+    .set({ ...data, updated_at: now })
     .where(eq(organizations.id, id))
     .returning();
 
@@ -58,7 +59,8 @@ export const PUT: RequestHandler = async ({ request, params }) => {
     return respond({ error: "Organization not found" }, 404);
   }
 
-  return respond(updated[0], 200);
+  const parsed = organizationSelectSchema.parse(updated[0]);
+  return respond(parsed, 200);
 };
 
 

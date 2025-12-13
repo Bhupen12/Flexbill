@@ -1,4 +1,4 @@
-import { ROLES } from '$lib/types';
+import { ROLES, type Role } from '$lib/types';
 import {
   Building2Icon,
   ShieldIcon,
@@ -18,7 +18,7 @@ export type ManuItems = {
   items: SidebarItem[]
 }
 
-export const SIDEBAR_BY_ROLE: Record<string, ManuItems[]> = {
+export const SIDEBAR_BY_ROLE: Partial<Record<Role, ManuItems[]>> = {
   [ROLES.SUPER_ADMIN]: [
     {
       title: "Organizations",
