@@ -2,7 +2,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 import { db } from '$lib/server/db';
 import { users } from '$lib/server/db/schema/users';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { ROLES } from '$lib/types';
 
 const isValidInput = (email: unknown, password: unknown): boolean => {
@@ -44,7 +44,11 @@ export const actions: Actions = {
       }
 
       const dbUser = await db.query.users.findFirst({
-        where: eq(users.auth_uid, data.user.id),
+        where: and(
+          eq(users.auth_uid, data.user.id),
+          eq(users.is_active, true),
+          eq(users.is_deleted, false)
+        ),
         columns: { role: true }
       });
 

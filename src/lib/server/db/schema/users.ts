@@ -5,9 +5,9 @@ export const roleEnum = pgEnum('user_role', ['super-admin', 'admin', 'user']);
 
 export const users = pgTable('users', {
   id: uuid('id').defaultRandom().primaryKey(),
-  auth_uid: uuid('auth_uid'),
+  auth_uid: uuid('auth_uid').unique(),
   organization_id: uuid('organization_id').references(() => organizations.id, { onDelete: 'set null' }),
-  email: text('email').notNull(),
+  email: text('email').notNull().unique(),
   full_name: text('full_name'),
   phone: text('phone'),
   role: roleEnum('role').default('user').notNull(),

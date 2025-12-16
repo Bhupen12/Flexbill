@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { type Handle } from "@sveltejs/kit";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 import { PUBLIC_SUPABASE_PUBLISHABLE_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { db } from "$lib/server/db";
@@ -41,7 +41,11 @@ export const handle: Handle = async ({ event, resolve }) => {
   const { user } = await event.locals.safeGetSession();
   if(user){
     const dbUser = await db.query.users.findFirst({
-      where: eq(users.auth_uid, user.id),
+      where: and(
+        eq(users.auth_uid, user.id),
+        eq(users.is_active, true),
+        eq(users.is_deleted, false)
+      ),
       columns: {
         id: true,
         role: true,
