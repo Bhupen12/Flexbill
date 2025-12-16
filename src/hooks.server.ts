@@ -1,5 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
-import { type Handle } from "@sveltejs/kit";
+import { error, type Handle } from "@sveltejs/kit";
 import { and, eq } from "drizzle-orm";
 
 import { PUBLIC_SUPABASE_PUBLISHABLE_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public';
@@ -55,6 +55,13 @@ export const handle: Handle = async ({ event, resolve }) => {
     event.locals.userProfile = dbUser || null;
   } else {
     event.locals.userProfile = null
+  }
+
+  const { pathname } = event.url;
+  if (pathname.startsWith('/api')){
+    if(!event.locals.userProfile){
+      return error(401, 'Unauthorized')
+    }
   }
 
   return resolve(event, {
