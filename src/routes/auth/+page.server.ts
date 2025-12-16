@@ -24,7 +24,7 @@ const getRedirectPathForRole = (role: string): string => {
 };
 
 export const actions: Actions = {
-  login: async ({ request, locals }) => {
+  signin: async ({ request, locals }) => {
     const formData = await request.formData();
     const email = formData.get('email');
     const password = formData.get('password');
@@ -69,5 +69,14 @@ export const actions: Actions = {
       console.error('Login error:', err);
       return fail(500, { message: 'Something went wrong. Please try again.' });
     }
-  }
+  },
+
+  signout: async ({ locals }) => {
+    try {
+      await locals.supabase.auth.signOut()
+    } catch (err) {
+      console.error('Failed to sign out:', err)
+    }
+    throw redirect(303, '/auth/signin')
+  },
 };
