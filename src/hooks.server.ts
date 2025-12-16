@@ -1,7 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
 import { type Handle } from "@sveltejs/kit";
+import { eq } from "drizzle-orm";
 
-import { PUBLIC_SUPABASE_URL,PUBLIC_SUPABASE_PUBLISHABLE_KEY } from '$env/static/public';
+import { PUBLIC_SUPABASE_PUBLISHABLE_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public';
+import { db } from "$lib/server/db";
+import { users } from "$lib/server/db/schema";
 
 export const handle: Handle = async ({ event, resolve }) => {
 
@@ -30,11 +33,26 @@ export const handle: Handle = async ({ event, resolve }) => {
       error,
     } = await event.locals.supabase.auth.getUser()
     if (error) {
-      // JWT validation has failed
       return { session: null, user: null }
     }
     return { session, user }
   }
+
+  const { user } = await event.locals.safeGetSession();
+  if(user){
+    const dbUser = await db.query.users.findFirst({
+      where: eq(users.auth_uid, user.id),
+      columns: {
+        id: true,
+        role: true,
+        email: true
+      }
+    })
+    event.locals.userProfile = dbUser || null;
+  } else {
+    event.locals.userProfile = null
+  }
+
   return resolve(event, {
     filterSerializedResponseHeaders(name) {
       return name === 'content-range' || name === 'x-supabase-api-version'
