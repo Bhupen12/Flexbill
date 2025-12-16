@@ -6,11 +6,29 @@ import {
   organizationInsertSchema,
   organizationSelectSchema
 } from "$lib/server/validation/organizations";
+import { resolvePagination } from "$lib/utils/pagination";
+import { sql } from "drizzle-orm";
 
-export const GET: RequestHandler = async () => {
-  const result = await db.select().from(organizations);
-  const parsed = organizationSelectSchema.array().parse(result);
-   return json(parsed, { status: 200 });
+export const GET: RequestHandler = async ({ url }) => {
+  const { page, size, offset } = resolvePagination(url);
+
+  const [data, totalResult] = await Promise.all([
+      db
+        .select()
+        .from(organizations)
+        .limit(size)
+        .offset(offset),
+      db
+        .select({ count: sql<number>`count(*)` })
+        .from(organizations)
+    ]);
+
+  return json({
+    data: organizationSelectSchema.array().parse(data),
+    page,
+    size,
+    total: totalResult[0].count
+  });
 }
 
 export const POST: RequestHandler = async ({ request }) => {
