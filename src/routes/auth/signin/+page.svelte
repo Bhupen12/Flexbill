@@ -25,7 +25,7 @@
       return
     }
 
-    goto('/landing')
+    goto('/org/billing')
   }
 </script>
 
