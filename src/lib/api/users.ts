@@ -15,7 +15,7 @@ export const usersApi = {
   },
 
   create(data: UserInsertType) {
-    return apiFetch(`${base}`, {
+    return apiFetch(`/api/admin/user`, {
       method: 'POST',
       body: JSON.stringify(data),
     });

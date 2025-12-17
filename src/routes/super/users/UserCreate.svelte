@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { usersApi, organizationsApi } from '$lib/api';
 	import type { UserSelectType, OrganizationSelect } from '$lib/types';
-	import { Check, ChevronsUpDown, Loader2 } from '@lucide/svelte'; // Added Loader icon
+	// Added Eye and EyeOff icons
+	import { Check, ChevronsUpDown, Loader2, Eye, EyeOff } from '@lucide/svelte';
 	import { cn } from '$lib/utils';
 
 	import { Button } from '$lib/components/ui/button';
@@ -18,6 +19,7 @@
 
 	let open = $state(false);
 	let creating = $state(false);
+	let showPassword = $state(false); // Toggle state for password visibility
 
 	// Organization Search State
 	let orgOpen = $state(false);
@@ -28,6 +30,7 @@
 	// Initial state
 	const initialUser = {
 		email: '',
+		password: '', // New field
 		full_name: '',
 		phone: '',
 		role: 'user' as const,
@@ -41,12 +44,10 @@
 		{ value: 'admin', label: 'Admin' }
 	];
 
-	// Derived state for UI cleanliness
 	const selectedOrgName = $derived(
 		orgOptions.find((o) => o.id === newUser.organization_id)?.name ?? 'Select Organization'
 	);
 
-	// Single Responsibility: Fetch Data Only
 	async function searchOrganizations(query: string) {
 		orgLoading = true;
 		try {
@@ -63,7 +64,6 @@
 		}
 	}
 
-	// Effect to trigger search
 	$effect(() => {
 		if (orgOpen) {
 			searchOrganizations(orgSearch);
@@ -71,14 +71,16 @@
 	});
 
 	async function createUser() {
-		if (!newUser.email || !newUser.organization_id) return;
+		// Basic validation
+		if (!newUser.email || !newUser.organization_id || !newUser.password) return;
 
 		creating = true;
 		try {
 			const newUserData = (await usersApi.create(newUser)) as UserSelectType;
 			onCreated(newUserData);
 			open = false;
-			newUser = { ...initialUser }; // Reset cleanly
+			newUser = { ...initialUser };
+			showPassword = false; // Reset visibility
 		} catch (e) {
 			console.error('Failed to create user', e);
 		} finally {
@@ -168,7 +170,7 @@
 						<Label class="text-foreground/80">Role</Label>
 						<Select.Root type="single" bind:value={newUser.role}>
 							<Select.Trigger class="w-full">
-								Select a role
+								"Select a role
 							</Select.Trigger>
 							<Select.Content>
 								{#each roles as role}
@@ -187,6 +189,33 @@
 					<div class="grid gap-2">
 						<Label class="text-foreground/80">Phone Number</Label>
 						<Input bind:value={newUser.phone} placeholder="+91..." />
+					</div>
+				</div>
+
+				<div class="grid gap-2">
+					<Label class="text-foreground/80">Password</Label>
+					<div class="relative">
+						<Input
+							type={showPassword ? 'text' : 'password'}
+							bind:value={newUser.password}
+							placeholder="Create a strong password"
+							class="pr-10"
+						/>
+						<Button
+							variant="ghost"
+							size="icon"
+							class="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+							onclick={() => (showPassword = !showPassword)}
+						>
+							{#if showPassword}
+								<EyeOff class="h-4 w-4 text-muted-foreground" />
+							{:else}
+								<Eye class="h-4 w-4 text-muted-foreground" />
+							{/if}
+							<span class="sr-only">
+								{showPassword ? 'Hide password' : 'Show password'}
+							</span>
+						</Button>
 					</div>
 				</div>
 			</div>

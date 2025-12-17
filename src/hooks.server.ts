@@ -49,7 +49,8 @@ export const handle: Handle = async ({ event, resolve }) => {
       columns: {
         id: true,
         role: true,
-        email: true
+        email: true,
+        organization_id: true
       }
     })
     event.locals.userProfile = dbUser || null;
