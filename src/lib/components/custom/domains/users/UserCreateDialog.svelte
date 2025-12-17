@@ -1,20 +1,21 @@
 <script lang="ts">
-	import { usersApi, organizationsApi } from '$lib/api';
-	import { ROLES, type UserSelectType, type OrganizationSelect } from '$lib/types';
-	import { Check, ChevronsUpDown, Loader2, Eye, EyeOff } from '@lucide/svelte';
-	import { cn } from '$lib/utils';
+	import { toast } from 'svelte-sonner';
 
-	// UI Components
+	import { organizationsApi, usersApi } from '$lib/api';
+	import { type OrganizationSelect, type UserSelectType } from '$lib/types';
+	import { cn } from '$lib/utils';
+	import { Check, ChevronsUpDown, Eye, EyeOff, Loader2 } from '@lucide/svelte';
+
 	import { Button } from '$lib/components/ui/button';
+	import * as Command from '$lib/components/ui/command';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
-	import * as Select from '$lib/components/ui/select';
-	import * as Command from '$lib/components/ui/command';
 	import * as Popover from '$lib/components/ui/popover';
+	import * as Select from '$lib/components/ui/select';
 	import { isSuperAdmin, user } from '$lib/stores/user';
 
-	// Props receive karte hain
+	// Props
 	let { onCreated } = $props<{
 		onCreated: (user: UserSelectType) => void;
 	}>();
@@ -23,13 +24,12 @@
 	let creating = $state(false);
 	let showPassword = $state(false);
 
-	// --- Organization Search State (Only used if isSuperAdmin) ---
+	// --- Org Search State ---
 	let orgOpen = $state(false);
 	let orgSearch = $state('');
 	let orgOptions = $state<OrganizationSelect[]>([]);
 	let orgLoading = $state(false);
 
-	// Initial state
 	const initialUser = {
 		email: '',
 		password: '',
@@ -58,28 +58,25 @@
 			orgOptions = res.data;
 		} catch (e) {
 			console.error(e);
+			toast.error('Failed to load organizations');
 		} finally {
 			orgLoading = false;
 		}
 	}
 
-	// Effect for Org Search
 	$effect(() => {
 		if (orgOpen && $isSuperAdmin) {
 			searchOrganizations(orgSearch);
 		}
 	});
 
-	// Reset logic when dialog opens/closes
 	$effect(() => {
 		if (!open) {
-			// Reset logic
 			setTimeout(() => {
 				newUser = { ...initialUser, organization_id: $user?.organization_id };
 				showPassword = false;
 			}, 200);
 		} else {
-			// Ensure orgId is correct when opening
 			if (!$isSuperAdmin && $user?.organization_id) {
 				newUser.organization_id = $user.organization_id;
 			}
@@ -87,15 +84,24 @@
 	});
 
 	async function createUser() {
-		if (!newUser.email || !newUser.password || !newUser.organization_id) return;
+		if (!newUser.email || !newUser.password || !newUser.organization_id) {
+			toast.warning('Please fill all required fields');
+			return;
+		}
 
 		creating = true;
 		try {
 			const newUserData = (await usersApi.create(newUser)) as UserSelectType;
+
+			toast.success(`User ${newUserData.full_name || 'Created'} successfully!`);
+
 			onCreated(newUserData);
 			open = false;
-		} catch (e) {
+		} catch (e: any) {
 			console.error('Failed to create user', e);
+			const errorMessage =
+				e?.body?.message || e?.message || 'Failed to create user. Please try again.';
+			toast.error(errorMessage);
 		} finally {
 			creating = false;
 		}

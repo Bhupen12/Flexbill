@@ -1,18 +1,17 @@
 <script lang="ts">
 	import { usersApi } from '$lib/api';
-	import { ROLES, type UserSelectType } from '$lib/types';
-
 	import UserCreateDialog from '$lib/components/custom/domains/users/UserCreateDialog.svelte';
 	import DataTable from '$lib/components/custom/shared-table/DataTable.svelte';
 	import ListPagination from '$lib/components/custom/shared-table/ListPagination.svelte';
 	import ListToolbar from '$lib/components/custom/shared-table/ListToolbar.svelte';
-
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import * as Table from '$lib/components/ui/table';
+	import { ROLES, type UserSelectType } from '$lib/types';
 	import { MoreHorizontal } from '@lucide/svelte';
+	import { toast } from 'svelte-sonner';
 
 	// State
 	let users = $state<UserSelectType[]>([]);
@@ -43,6 +42,7 @@
 			total = res.total;
 		} catch (e) {
 			console.error(e);
+			toast.error("Unable to load users list");
 		} finally {
 			loading = false;
 		}
