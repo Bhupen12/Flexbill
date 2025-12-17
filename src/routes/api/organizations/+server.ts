@@ -8,20 +8,23 @@ import {
 } from "$lib/server/validation/organizations";
 import { resolvePagination } from "$lib/utils/pagination";
 import { sql } from "drizzle-orm";
+import { ilike } from "drizzle-orm";
 
 export const GET: RequestHandler = async ({ url }) => {
   const { page, size, offset } = resolvePagination(url);
+  const search = url.searchParams.get('search')?.trim();
 
   const [data, totalResult] = await Promise.all([
-      db
-        .select()
-        .from(organizations)
-        .limit(size)
-        .offset(offset),
-      db
-        .select({ count: sql<number>`count(*)` })
-        .from(organizations)
-    ]);
+    db
+      .select()
+      .from(organizations)
+      .where(search ? ilike(organizations.name, `%${search}%`) : undefined)
+      .limit(size)
+      .offset(offset),
+    db
+      .select({ count: sql<number>`count(*)` })
+      .from(organizations)
+  ]);
 
   return json({
     data: organizationSelectSchema.array().parse(data),

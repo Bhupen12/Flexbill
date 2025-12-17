@@ -1,20 +1,12 @@
-import type { PaginatedResponse, UserInsertType, UserSelectType, UserUpdateType } from "$lib/types";
-import { apiFetch } from "./client";
+import type { PaginatedResponse, QueryParams, UserInsertType, UserSelectType, UserUpdateType } from "$lib/types";
+import { apiFetch, buildQuery } from "./client";
 
 const base = '/api/users';
 
 export const usersApi = {
-  list(params?: {
-    page?: number;
-    size?: number;
-  }): Promise<PaginatedResponse<UserSelectType>> {
-    const query = new URLSearchParams();
-
-    if (params?.page) query.set('page', String(params.page));
-    if (params?.size) query.set('size', String(params.size));
-
-    return apiFetch<PaginatedResponse<UserSelectType>>(
-      `${base}?${query.toString()}`
+  list(params?: QueryParams): Promise<PaginatedResponse<UserSelectType[]>> {
+    return apiFetch<PaginatedResponse<UserSelectType[]>>(
+      `${base}${buildQuery(params)}`
     );
   },
 

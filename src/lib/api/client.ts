@@ -1,3 +1,5 @@
+import type { QueryParams } from "$lib/types";
+
 export async function apiFetch<T>(
   url: string,
   options: RequestInit = {}
@@ -24,4 +26,19 @@ export async function apiFetch<T>(
   }
 
   return data as T;
+}
+
+export function buildQuery(params?: QueryParams): string {
+  if (!params) return '';
+
+  const qs = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== null) {
+      qs.set(key, String(value));
+    }
+  }
+
+  const query = qs.toString();
+  return query ? `?${query}` : '';
 }
