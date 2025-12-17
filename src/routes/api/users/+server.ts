@@ -14,7 +14,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
   const roleParam = url.searchParams.get('role');
   const role =
-    roleParam === ROLES.SUPER_ADMIN||
+      roleParam === ROLES.SUPER_ADMIN ||
       roleParam === ROLES.ADMIN ||
       roleParam === ROLES.USER
       ? roleParam
