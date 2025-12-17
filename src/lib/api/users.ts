@@ -4,8 +4,8 @@ import { apiFetch, buildQuery } from "./client";
 const base = '/api/users';
 
 export const usersApi = {
-  list(params?: QueryParams): Promise<PaginatedResponse<UserSelectType[]>> {
-    return apiFetch<PaginatedResponse<UserSelectType[]>>(
+  list(params?: QueryParams): Promise<PaginatedResponse<UserSelectType>> {
+    return apiFetch<PaginatedResponse<UserSelectType>>(
       `${base}${buildQuery(params)}`
     );
   },
