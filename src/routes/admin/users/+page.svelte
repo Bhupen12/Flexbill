@@ -43,7 +43,7 @@
 			const res = await usersApi.list({
 				page,
 				size,
-				search: search || undefined
+				search: search || undefined,
 			});
 
 			users = res.data;
@@ -57,16 +57,13 @@
 	}
 
 	function handleUserCreated(newUserData: UserSelectType) {
-		// Add to top and update total locally to avoid refetch
 		users = [newUserData, ...users];
 		if (users.length > size) users.pop(); // Keep page size consistent
 		total += 1;
 	}
 
-	// Effect handles fetching when deps change
 	$effect(() => {
 		loadUsers();
-		// Reactive dependencies:
 		page;
 		size;
 		search;

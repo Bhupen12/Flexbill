@@ -1,26 +1,34 @@
 import { json, type RequestHandler } from "@sveltejs/kit";
 import { and, eq, ilike, sql } from "drizzle-orm";
 
+import { requireRole } from "$lib/server/auth/requireRole";
 import { db } from "$lib/server/db";
 import { users } from "$lib/server/db/schema";
 import { userSelectSchema } from "$lib/server/validation/users";
-import { resolvePagination } from "$lib/utils/pagination";
 import { ROLES } from "$lib/types";
+import { resolvePagination } from "$lib/utils/pagination";
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+  const currentUser = requireRole(locals, [ROLES.SUPER_ADMIN, ROLES.ADMIN], {
+    sameOrganization: true
+  })
   const { page, size, offset } = resolvePagination(url);
 
   const search = url.searchParams.get('search')?.trim() || null;
 
   const roleParam = url.searchParams.get('role');
   const role =
-      roleParam === ROLES.SUPER_ADMIN ||
+    roleParam === ROLES.SUPER_ADMIN ||
       roleParam === ROLES.ADMIN ||
       roleParam === ROLES.USER
       ? roleParam
       : null;
 
   const conditions = [];
+
+  if (currentUser.role === ROLES.ADMIN) {
+    conditions.push(eq(users.organization_id, currentUser.organization_id!));
+  }
 
   if (search) {
     conditions.push(ilike(users.full_name, `%${search}%`));
