@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { usersApi } from '$lib/api/users';
+	import { usersApi } from '$lib/api';
 	import type { UserSelectType, UserInsertType } from '$lib/types';
 
 	import { Button } from '$lib/components/ui/button';

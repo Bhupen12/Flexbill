@@ -1,24 +1,27 @@
 import { json, type RequestHandler } from "@sveltejs/kit";
+import { and, ilike, sql } from "drizzle-orm";
 
 import { db } from "$lib/server/db";
 import { organizations } from "$lib/server/db/schema";
-import {
-  organizationInsertSchema,
-  organizationSelectSchema
-} from "$lib/server/validation/organizations";
+import { organizationInsertSchema, organizationSelectSchema } from "$lib/server/validation/organizations";
 import { resolvePagination } from "$lib/utils/pagination";
-import { sql } from "drizzle-orm";
-import { ilike } from "drizzle-orm";
 
 export const GET: RequestHandler = async ({ url }) => {
   const { page, size, offset } = resolvePagination(url);
-  const search = url.searchParams.get('search')?.trim();
+  const search = url.searchParams.get('search')?.trim() || null;
+
+  const conditions = [];
+  if (search) {
+    conditions.push(ilike(organizations.name, `%${search}%`))
+  }
+
+  const whereCondition = conditions.length > 0 ? and(...conditions) : undefined;
 
   const [data, totalResult] = await Promise.all([
     db
       .select()
       .from(organizations)
-      .where(search ? ilike(organizations.name, `%${search}%`) : undefined)
+      .where(whereCondition)
       .limit(size)
       .offset(offset),
     db
