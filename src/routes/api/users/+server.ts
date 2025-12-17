@@ -6,7 +6,7 @@ import { db } from "$lib/server/db";
 import { users } from "$lib/server/db/schema";
 import { userSelectSchema } from "$lib/server/validation/users";
 import { ROLES } from "$lib/types";
-import { resolvePagination } from "$lib/utils/pagination";
+import { resolvePagination } from "$lib/hooks/pagination";
 
 export const GET: RequestHandler = async ({ url, locals }) => {
   const currentUser = requireRole(locals, [ROLES.SUPER_ADMIN, ROLES.ADMIN], {

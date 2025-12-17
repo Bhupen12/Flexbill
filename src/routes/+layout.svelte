@@ -8,7 +8,6 @@
 <Toaster 
   position="top-center" 
   theme="system"
-  richColors
   duration={4000} 
   closeButton 
 />

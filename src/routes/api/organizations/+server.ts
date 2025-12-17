@@ -4,7 +4,7 @@ import { and, ilike, sql } from "drizzle-orm";
 import { db } from "$lib/server/db";
 import { organizations } from "$lib/server/db/schema";
 import { organizationInsertSchema, organizationSelectSchema } from "$lib/server/validation/organizations";
-import { resolvePagination } from "$lib/utils/pagination";
+import { resolvePagination } from "$lib/hooks/pagination";
 
 export const GET: RequestHandler = async ({ url }) => {
   const { page, size, offset } = resolvePagination(url);
