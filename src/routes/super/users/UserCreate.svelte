@@ -170,7 +170,7 @@
 						<Label class="text-foreground/80">Role</Label>
 						<Select.Root type="single" bind:value={newUser.role}>
 							<Select.Trigger class="w-full">
-								"Select a role
+								Select a role
 							</Select.Trigger>
 							<Select.Content>
 								{#each roles as role}
