@@ -61,7 +61,11 @@
 				<form action="/auth?/signout" method="post">
 					<Sidebar.MenuButton class="gap-x-4 h-10 px-4" tooltipContent="Logout">
 						{#snippet child(props)}
-							<Button type='submit' variant='secondary' class='cursor-pointer w-full flex justify-start'>
+							<Button
+								type="submit"
+								variant="secondary"
+								class="cursor-pointer w-full flex justify-start"
+							>
 								<LogOutIcon />
 								<span>Logout</span>
 							</Button>

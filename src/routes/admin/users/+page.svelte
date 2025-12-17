@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { usersApi } from '$lib/api';
+	import UserCreateDialog from '$lib/components/custom/domains/users/UserCreateDialog.svelte';
 	import { ROLES, type UserSelectType } from '$lib/types';
-	import UserCreate from './UserCreate.svelte';
-	
+
 	import DataTable from '$lib/components/custom/shared-table/DataTable.svelte';
 	import ListPagination from '$lib/components/custom/shared-table/ListPagination.svelte';
 	import ListToolbar from '$lib/components/custom/shared-table/ListToolbar.svelte';
-	
+
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
@@ -64,7 +64,7 @@
 			<h1 class="text-2xl font-bold tracking-tight">Users</h1>
 			<p class="text-muted-foreground">Manage your team members.</p>
 		</div>
-		<UserCreate onCreated={handleUserCreated} />
+		<UserCreateDialog onCreated={handleUserCreated} />
 	</div>
 
 	<Card.Root>

@@ -2,7 +2,7 @@
 	import { usersApi } from '$lib/api';
 	import { ROLES, type UserSelectType } from '$lib/types';
 
-	import UserCreate from './UserCreate.svelte';
+	import UserCreateDialog from '$lib/components/custom/domains/users/UserCreateDialog.svelte';
 	import DataTable from '$lib/components/custom/shared-table/DataTable.svelte';
 	import ListPagination from '$lib/components/custom/shared-table/ListPagination.svelte';
 	import ListToolbar from '$lib/components/custom/shared-table/ListToolbar.svelte';
@@ -68,7 +68,7 @@
 			<h1 class="text-2xl font-bold tracking-tight">All Users</h1>
 			<p class="text-muted-foreground">Manage users across all organizations.</p>
 		</div>
-		<UserCreate onCreated={handleUserCreated} />
+		<UserCreateDialog onCreated={handleUserCreated} />
 	</div>
 
 	<Card.Root>
