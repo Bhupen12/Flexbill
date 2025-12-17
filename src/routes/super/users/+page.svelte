@@ -1,17 +1,25 @@
 <script lang="ts">
 	import { usersApi } from '$lib/api';
-	import type { UserSelectType, UserInsertType } from '$lib/types';
+	import { ROLES, type UserSelectType } from '$lib/types';
+	import UserCreate from './UserCreate.svelte';
 
+	// UI Components
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
-	import * as Dialog from '$lib/components/ui/dialog';
-	import { Label } from '$lib/components/ui/label';
+	import * as Select from '$lib/components/ui/select';
+	import * as Table from '$lib/components/ui/table';
+	import * as Card from '$lib/components/ui/card';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import Badge from '$lib/components/ui/badge/badge.svelte';
 
-	// ===== list state =====
+	// Icons
+	import { Search, MoreHorizontal, ChevronLeft, ChevronRight, UserX, Loader2 } from '@lucide/svelte';
+
 	let users = $state<UserSelectType[]>([]);
 	let loading = $state(false);
-	let error= $state<string | null>(null);
+	let error = $state<string | null>(null);
 
+	// Pagination state
 	let page = $state(1);
 	let size = $state(10);
 	let total = $state(0);
@@ -19,20 +27,19 @@
 
 	const totalPages = $derived(Math.ceil(total / size));
 
-	// ===== create user state =====
-	let openCreate = $state(false);
-	let creating = $state(false);
+	// Display text for pagination info
+	const startRecord = $derived((page - 1) * size + 1);
+	const endRecord = $derived(Math.min(page * size, total));
 
-	let newUser: UserInsertType = $state({
-		full_name: '',
-		email: '',
-		role: 'user'
-	});
+	const pageSizes = [
+		{ value: '10', label: '10 rows' },
+		{ value: '20', label: '20 rows' },
+		{ value: '50', label: '50 rows' }
+	];
 
 	async function loadUsers() {
 		loading = true;
 		try {
-			debugger
 			const res = await usersApi.list({
 				page,
 				size,
@@ -41,136 +48,191 @@
 
 			users = res.data;
 			total = res.total;
-		} catch {
+		} catch (e) {
 			error = 'Failed to load users';
+			console.error(e);
 		} finally {
 			loading = false;
 		}
 	}
 
-	async function createUser() {
-		creating = true;
-		try {
-			await usersApi.create(newUser);
-			openCreate = false;
-			page = 1;
-			await loadUsers();
-
-			// reset
-			newUser = { full_name: '', email: '', role: 'user' };
-		} finally {
-			creating = false;
-		}
+	function handleUserCreated(newUserData: UserSelectType) {
+		// Add to top and update total locally to avoid refetch
+		users = [newUserData, ...users];
+		if (users.length > size) users.pop(); // Keep page size consistent
+		total += 1;
 	}
 
+	// Effect handles fetching when deps change
 	$effect(() => {
+		// Note: Production mein yahan debounce lagana mat bhoolna search ke liye
+		loadUsers();
+		// Reactive dependencies:
 		page;
 		size;
 		search;
-		loadUsers();
 	});
 </script>
 
-<div class="p-6 space-y-4">
-	<!-- header -->
-	<div class="flex justify-between items-center">
-		<h1 class="text-xl font-semibold">Users</h1>
+<div class="flex flex-col gap-6 p-6">
+	<div class="flex items-center justify-between">
+		<div>
+			<h1 class="text-2xl font-bold tracking-tight">Users</h1>
+			<p class="text-muted-foreground">
+				Manage your team members and their account permissions here.
+			</p>
+		</div>
+		<UserCreate onCreated={handleUserCreated} />
+	</div>
 
-		<Dialog.Root bind:open={openCreate}>
-			<Dialog.Trigger>
-				<Button>Create User</Button>
-			</Dialog.Trigger>
-
-			<Dialog.Content class="sm:max-w-md">
-				<Dialog.Header>
-					<Dialog.Title>Create User</Dialog.Title>
-				</Dialog.Header>
-
-				<div class="space-y-4">
-					<div>
-						<Label>Name</Label>
-						<Input bind:value={newUser.full_name} />
-					</div>
-
-					<div>
-						<Label>Email</Label>
-						<Input bind:value={newUser.email} type="email" />
-					</div>
-
-					<div>
-						<Label>Role</Label>
-						<select bind:value={newUser.role} class="w-full border rounded px-2 py-2">
-							<option value="USER">User</option>
-							<option value="ADMIN">Admin</option>
-						</select>
-					</div>
+	<Card.Root>
+		<Card.Header class="pb-2">
+			<div class="flex items-center justify-between gap-4">
+				<div class="relative w-full max-w-sm">
+					<Search class="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+					<Input
+						type="search"
+						placeholder="Search by name or email..."
+						class="pl-9"
+						bind:value={search}
+					/>
 				</div>
 
-				<Dialog.Footer>
-					<Button disabled={creating} onclick={createUser}>
-						{creating ? 'Creating…' : 'Create'}
-					</Button>
-				</Dialog.Footer>
-			</Dialog.Content>
-		</Dialog.Root>
-	</div>
+				<div class="flex items-center gap-2">
+					<span class="text-sm text-muted-foreground whitespace-nowrap">Rows per page</span>
+					<Select.Root
+						type="single"
+						value={String(size)}
+						onValueChange={(v) => {
+							size = Number(v);
+							page = 1;
+						}}
+					>
+						<Select.Trigger class="w-25">
+							{pageSizes.find((p) => p.value === String(size))?.label}
+						</Select.Trigger>
+						<Select.Content>
+							{#each pageSizes as ps}
+								<Select.Item value={ps.value}>{ps.label}</Select.Item>
+							{/each}
+						</Select.Content>
+					</Select.Root>
+				</div>
+			</div>
+		</Card.Header>
 
-	<!-- filters -->
-	<div class="flex gap-3">
-		<Input placeholder="Search users" bind:value={search} class="max-w-sm" />
+		<Card.Content>
+			<div class="rounded-md border">
+				<Table.Root>
+					<Table.Header>
+						<Table.Row class="bg-muted/50">
+							<Table.Head class="w-25">ID</Table.Head>
+							<Table.Head>User Info</Table.Head>
+							<Table.Head>Phone</Table.Head>
+							<Table.Head>Role</Table.Head>
+							<Table.Head class="text-right">Actions</Table.Head>
+						</Table.Row>
+					</Table.Header>
 
-		<select bind:value={size} class="border rounded px-2 py-2">
-			<option value={10}>10</option>
-			<option value={20}>20</option>
-			<option value={50}>50</option>
-		</select>
-	</div>
+					<Table.Body>
+						{#if loading}
+							<Table.Row>
+								<Table.Cell colspan={5} class="h-24 text-center">
+									<div class="flex items-center justify-center text-muted-foreground">
+										<Loader2 class="mr-2 h-4 w-4 animate-spin" /> Loading users...
+									</div>
+								</Table.Cell>
+							</Table.Row>
+						{:else if users.length === 0}
+							<Table.Row>
+								<Table.Cell colspan={5} class="h-75 text-center">
+									<div
+										class="flex flex-col items-center justify-center text-muted-foreground gap-2"
+									>
+										<UserX class="h-10 w-10 opacity-20" />
+										<p>No users found matching your search.</p>
+									</div>
+								</Table.Cell>
+							</Table.Row>
+						{:else}
+							{#each users as user (user.id)}
+								<Table.Row>
+									<Table.Cell class="font-mono text-xs text-muted-foreground">
+										#{user.id.substring(0, 6)}
+									</Table.Cell>
 
-	<!-- table -->
-	{#if loading}
-		<p>Loading…</p>
-	{:else}
-		<div class="border rounded">
-			<table class="w-full">
-				<thead class="bg-muted">
-					<tr>
-						<th class="text-left p-2">Name</th>
-						<th class="text-left p-2">Email</th>
-						<th class="text-left p-2">Role</th>
-						<th class="text-left p-2">Action</th>
-					</tr>
-				</thead>
+									<Table.Cell>
+										<div class="flex flex-col">
+											<span class="font-medium">{user.full_name || 'Unknown User'}</span>
+											<span class="text-xs text-muted-foreground">{user.email}</span>
+										</div>
+									</Table.Cell>
 
-				<tbody>
-					{#each users as user}
-						<tr class="border-t">
-							<td class="p-2">{user.full_name}</td>
-							<td class="p-2">{user.email}</td>
-							<td class="p-2">{user.role}</td>
-							<td class="p-2">
-								<a href={`/super/users/${user.id}`} class="text-primary underline"> View </a>
-							</td>
-						</tr>
-					{/each}
+									<Table.Cell>
+										{user.phone || '-'}
+									</Table.Cell>
 
-					{#if users.length === 0}
-						<tr>
-							<td colspan="4" class="text-center p-6 text-muted-foreground"> No users found </td>
-						</tr>
-					{/if}
-				</tbody>
-			</table>
-		</div>
-	{/if}
+									<Table.Cell>
+										<Badge
+											variant={user.role === ROLES.ADMIN
+												? 'default'
+												: user.role === ROLES.SUPER_ADMIN
+													? 'destructive'
+													: 'secondary'}
+										>
+											{user.role}
+										</Badge>
+									</Table.Cell>
 
-	<!-- pagination -->
-	<div class="flex items-center gap-3">
-		<Button variant="outline" disabled={page === 1} onclick={() => page--}>Prev</Button>
+									<Table.Cell class="text-right">
+										<DropdownMenu.Root>
+											<DropdownMenu.Trigger>
+												{#snippet child({ props })}
+													<Button {...props} variant="ghost" size="icon" class="h-8 w-8">
+														<MoreHorizontal class="h-4 w-4" />
+														<span class="sr-only">Open menu</span>
+													</Button>
+												{/snippet}
+											</DropdownMenu.Trigger>
+											<DropdownMenu.Content align="end">
+												<DropdownMenu.Label>Actions</DropdownMenu.Label>
+												<DropdownMenu.Item onclick={() => navigator.clipboard.writeText(user.id)}>
+													Copy ID
+												</DropdownMenu.Item>
+												<DropdownMenu.Separator />
+												<DropdownMenu.Item>
+													View Details
+												</DropdownMenu.Item>
+												<DropdownMenu.Item class="text-destructive">Delete User</DropdownMenu.Item>
+											</DropdownMenu.Content>
+										</DropdownMenu.Root>
+									</Table.Cell>
+								</Table.Row>
+							{/each}
+						{/if}
+					</Table.Body>
+				</Table.Root>
+			</div>
+		</Card.Content>
 
-		<span class="text-sm">
-			Page {page} of {totalPages}
-		</span>
+		<Card.Footer class="flex items-center justify-between py-4">
+			<div class="text-xs text-muted-foreground">
+				Showing <strong>{startRecord}-{endRecord}</strong> of <strong>{total}</strong> users
+			</div>
 
-		<Button variant="outline" disabled={page === totalPages} onclick={() => page++}>Next</Button>
-	</div>
+			<div class="flex items-center gap-2">
+				<Button variant="outline" size="sm" disabled={page === 1 || loading} onclick={() => page--}>
+					<ChevronLeft class="h-4 w-4 mr-1" /> Previous
+				</Button>
+				<Button
+					variant="outline"
+					size="sm"
+					disabled={page >= totalPages || loading}
+					onclick={() => page++}
+				>
+					Next <ChevronRight class="h-4 w-4 ml-1" />
+				</Button>
+			</div>
+		</Card.Footer>
+	</Card.Root>
 </div>
