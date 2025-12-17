@@ -1,23 +1,35 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import type { SubmitFunction } from '@sveltejs/kit';
-	import type { ActionData } from '../$types';
 
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
-	import { AlertCircle, Eye, EyeOff, Loader2, LockKeyhole } from '@lucide/svelte';
-
-	let { form } = $props<{ form: ActionData }>();
+	import { Eye, EyeOff, Loader2, LockKeyhole } from '@lucide/svelte';
+	import { toast } from 'svelte-sonner';
 
 	let loading = $state(false);
 	let showPassword = $state(false);
 
 	const submitLogin: SubmitFunction = () => {
 		loading = true;
-		return async ({ update }) => {
+		return async ({ update, result }) => {
 			loading = false;
+
+			switch (result.type) {
+				case 'failure':
+					toast.error(result.data?.message || 'Login failed');
+					break;
+				case 'redirect':
+					toast.success('Login successful! Redirecting...', {
+						duration: 1000
+					});
+					break;
+				case 'error':
+					toast.error('Something went wrong. Please try again later.');
+					break;
+			}
 			await update();
 		};
 	};
@@ -37,15 +49,6 @@
 
 		<Card.Content>
 			<form method="POST" action="/auth?/signin" use:enhance={submitLogin} class="space-y-4">
-				{#if form?.message}
-					<div
-						class="flex items-center gap-2 p-3 text-sm text-destructive bg-destructive/10 rounded-md border border-destructive/20"
-					>
-						<AlertCircle class="h-4 w-4" />
-						<p>{form.message}</p>
-					</div>
-				{/if}
-
 				<div class="space-y-2">
 					<Label for="email">Email</Label>
 					<Input
@@ -61,12 +64,6 @@
 				<div class="space-y-2">
 					<div class="flex items-center justify-between">
 						<Label for="password">Password</Label>
-						<a
-							href="/auth/forgot-password"
-							class="text-xs text-primary underline-offset-4 hover:underline"
-						>
-							Forgot password?
-						</a>
 					</div>
 
 					<div class="relative">
@@ -105,14 +102,5 @@
 				</Button>
 			</form>
 		</Card.Content>
-
-		<Card.Footer>
-			<div class="text-sm text-muted-foreground text-center w-full">
-				Don't have an account?
-				<a href="/auth/register" class="text-primary underline-offset-4 hover:underline">
-					Sign up
-				</a>
-			</div>
-		</Card.Footer>
 	</Card.Root>
 </div>
