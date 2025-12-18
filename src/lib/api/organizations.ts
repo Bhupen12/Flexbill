@@ -14,15 +14,15 @@ export const organizationsApi = {
     return apiFetch<OrganizationSelect>(`${base}/${id}`);
   },
 
-  create(data: OrganizationInsert) {
-    return apiFetch(`${base}`, {
+  create(data: OrganizationInsert): Promise<OrganizationSelect> {
+    return apiFetch<OrganizationSelect>(`${base}`, {
       method: 'POST',
       body: JSON.stringify(data),
     });
   },
 
-  update(id: string, data: OrganizationUpdate) {
-    return apiFetch(`${base}/${id}`, {
+  update(id: string, data: OrganizationUpdate): Promise<OrganizationSelect> {
+    return apiFetch<OrganizationSelect>(`${base}/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });

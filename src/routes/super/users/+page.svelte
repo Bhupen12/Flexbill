@@ -31,26 +31,22 @@
 
 	const userRequest = new AsyncRequest<any>();
 	async function loadUsers() {
-		await userRequest.call(
-			usersApi.list({page, size, search}),
-			{
-				onSuccess: (res) => {
-					users = res.data;
-					total = res.total;
-				},
-				showToast: false
+		await userRequest.call(usersApi.list({ page, size, search }), {
+			onSuccess: (res) => {
+				users = res.data;
+				total = res.total;
 			}
-		)
+		});
 	}
 
 	function handleUserCreated(newUserData: UserSelectType) {
 		total += 1;
 		if (page === 1) {
-	    users = [newUserData, ...users];
-	    if (users.length > size) users.pop();
-	  } else {
-	    page = 1;
-	  }
+			users = [newUserData, ...users];
+			if (users.length > size) users.pop();
+		} else {
+			page = 1;
+		}
 	}
 
 	$effect(() => {
