@@ -1,7 +1,7 @@
 import { json, type RequestHandler } from "@sveltejs/kit";
 import { and, eq, ilike, sql } from "drizzle-orm";
 
-import { requireRole } from "$lib/server/auth/requireRole";
+import { requireRole } from "$lib/server/auth/userinfo";
 import { db } from "$lib/server/db";
 import { users } from "$lib/server/db/schema";
 import { userSelectSchema } from "$lib/server/validation/users";

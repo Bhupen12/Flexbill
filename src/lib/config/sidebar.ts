@@ -1,6 +1,7 @@
 import { ROLES, type Role } from '$lib/types';
 import {
   Building2Icon,
+  Layers2Icon,
   ShieldIcon,
   type IconProps
 } from '@lucide/svelte';
@@ -45,6 +46,11 @@ export const SIDEBAR_BY_ROLE: Partial<Record<Role, ManuItems[]>> = {
           title: "Users",
           url: "/admin/users",
           icon: ShieldIcon
+        },
+        {
+          title: "Products",
+          url: "/admin/products",
+          icon: Layers2Icon
         }
       ]
     }
