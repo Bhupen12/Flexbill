@@ -5,5 +5,10 @@
 	let { children } = $props();
 </script>
 
-<Toaster />
+<Toaster 
+  position="top-center" 
+  theme="system"
+  duration={4000} 
+  closeButton 
+/>
 {@render children()}

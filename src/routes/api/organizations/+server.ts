@@ -1,16 +1,40 @@
 import { json, type RequestHandler } from "@sveltejs/kit";
+import { and, ilike, sql } from "drizzle-orm";
 
 import { db } from "$lib/server/db";
 import { organizations } from "$lib/server/db/schema";
-import {
-  organizationInsertSchema,
-  organizationSelectSchema
-} from "$lib/server/validation/organizations";
+import { organizationInsertSchema, organizationSelectSchema } from "$lib/server/validation/organizations";
+import { resolvePagination } from "$lib/hooks/pagination";
 
-export const GET: RequestHandler = async () => {
-  const result = await db.select().from(organizations);
-  const parsed = organizationSelectSchema.array().parse(result);
-   return json(parsed, { status: 200 });
+export const GET: RequestHandler = async ({ url }) => {
+  const { page, size, offset } = resolvePagination(url);
+  const search = url.searchParams.get('search')?.trim() || null;
+
+  const conditions = [];
+  if (search) {
+    conditions.push(ilike(organizations.name, `%${search}%`))
+  }
+
+  const whereCondition = conditions.length > 0 ? and(...conditions) : undefined;
+
+  const [data, totalResult] = await Promise.all([
+    db
+      .select()
+      .from(organizations)
+      .where(whereCondition)
+      .limit(size)
+      .offset(offset),
+    db
+      .select({ count: sql<number>`count(*)` })
+      .from(organizations)
+  ]);
+
+  return json({
+    data: organizationSelectSchema.array().parse(data),
+    page,
+    size,
+    total: totalResult[0].count
+  });
 }
 
 export const POST: RequestHandler = async ({ request }) => {

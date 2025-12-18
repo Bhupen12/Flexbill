@@ -1,18 +1,15 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
+	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import { SIDEBAR_BY_ROLE } from '$lib/config/sidebar';
-	import { useAuth } from '$lib/context/auth.svelte';
+	import { user } from '$lib/stores/user';
+	import { ROLES } from '$lib/types';
 	import { LogOutIcon, ReceiptIcon } from '@lucide/svelte';
 
-	const { role } = useAuth();
+	const role = $user?.role || ROLES.USER;
 
 	const items = $derived(SIDEBAR_BY_ROLE[role] ?? []);
-
-	function logout() {
-		goto('/');
-	}
 
 	const isActiveRoute = (url: string) => {
 		return $page.url.pathname === url;
@@ -61,10 +58,20 @@
 	<Sidebar.Footer>
 		<Sidebar.Menu>
 			<Sidebar.MenuItem>
-				<Sidebar.MenuButton class="gap-x-4 h-10 px-4" tooltipContent="Logout" onclick={logout}>
-					<LogOutIcon />
-					<span>Logout</span>
-				</Sidebar.MenuButton>
+				<form action="/auth?/signout" method="post">
+					<Sidebar.MenuButton class="gap-x-4 h-10 px-4" tooltipContent="Logout">
+						{#snippet child(props)}
+							<Button
+								type="submit"
+								variant="secondary"
+								class="cursor-pointer w-full flex justify-start"
+							>
+								<LogOutIcon />
+								<span>Logout</span>
+							</Button>
+						{/snippet}
+					</Sidebar.MenuButton>
+				</form>
 			</Sidebar.MenuItem>
 		</Sidebar.Menu>
 	</Sidebar.Footer>

@@ -1,11 +1,13 @@
-import type { OrganizationInsert, OrganizationSelect, OrganizationUpdate } from "$lib/types";
-import { apiFetch } from "./client";
+import type { OrganizationInsert, OrganizationSelect, OrganizationUpdate, PaginatedResponse, QueryParams } from "$lib/types";
+import { apiFetch, buildQuery } from "./client";
 
 const base = '/api/organizations';
 
 export const organizationsApi = {
-  list(): Promise<OrganizationSelect[]> {
-    return apiFetch<OrganizationSelect[]>(`${base}`);
+  list(params?: QueryParams): Promise<PaginatedResponse<OrganizationSelect>> {
+    return apiFetch<PaginatedResponse<OrganizationSelect>>(
+      `${base}${buildQuery(params)}`
+    );
   },
 
   get(id: string): Promise<OrganizationSelect> {

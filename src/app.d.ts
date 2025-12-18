@@ -13,6 +13,7 @@ declare global {
         id: string
         role: Role
         email: string
+        organization_id: string | null
       } | null
     }
     interface PageData {

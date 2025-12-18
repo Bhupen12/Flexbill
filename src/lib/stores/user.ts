@@ -7,3 +7,5 @@ export const user = derived(page, ($page) => $page.data.userProfile);
 export const isLoggedIn = derived(page, ($page) => !!$page.data.userProfile);
 
 export const isSuperAdmin = derived(page, ($page) => $page.data.userProfile?.role === ROLES.SUPER_ADMIN);
+
+export const isAdmin = derived(page, ($page) => $page.data.userProfile?.role === ROLES.ADMIN);

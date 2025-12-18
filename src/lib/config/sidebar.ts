@@ -25,30 +25,30 @@ export const SIDEBAR_BY_ROLE: Partial<Record<Role, ManuItems[]>> = {
       items: [
         {
           title: 'Organizations',
-          url: '/super-admin/organizations',
+          url: '/super/organizations',
           icon: Building2Icon
         },
         {
           title: 'Platform Users',
-          url: '/super-admin/users',
+          url: '/super/users',
           icon: ShieldIcon
         }
       ]
     }
   ],
 
-  // [ROLES.ADMIN]: [
-  //   {
-  //     title: 'Organization',
-  //     url: '/admin/organization',
-  //     icon: Building2Icon
-  //   },
-  //   {
-  //     title: 'Users',
-  //     url: '/admin/users',
-  //     icon: UserIcon
-  //   }
-  // ],
+  [ROLES.ADMIN]: [
+    {
+      title: "Organization",
+      items: [
+        {
+          title: "Users",
+          url: "/admin/users",
+          icon: ShieldIcon
+        }
+      ]
+    }
+  ],
 
   // [ROLES.USER]: [
   //   {
