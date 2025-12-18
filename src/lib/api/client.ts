@@ -1,31 +1,46 @@
 import type { QueryParams } from "$lib/types";
 
+export class ApiError extends Error {
+  constructor(
+    public message: string,
+    public status: number,
+    public data?: any
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
 export async function apiFetch<T>(
   url: string,
   options: RequestInit = {}
 ): Promise<T> {
+  const defaultHeaders = {
+    'Content-Type': 'application/json',
+  };
+
   const res = await fetch(url, {
     ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(options.headers || {}),
-    },
+    headers: {...defaultHeaders, ...options.headers},
   });
 
-  const data = await res.json();
-
-  if (!res.ok) {
-    let errorMessage = 'API request failed';
-    try {
-      const data = await res.json();
-      errorMessage = data.message || errorMessage;
-    } catch {
-      // Ignore JSON parsing errors
-    }
-    throw new Error(errorMessage);
+  let responseData: any;
+  try {
+    responseData = await res.json()
+  } catch {
+    responseData = null;
   }
 
-  return data as T;
+  if (!res.ok) {
+    const errorMessage = responseData?.message || `API Error: ${res.statusText}`;
+    throw new ApiError(
+      errorMessage,
+      res.status,
+      responseData
+    );
+  }
+
+  return responseData as T;
 }
 
 export function buildQuery(params?: QueryParams): string {

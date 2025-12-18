@@ -1,24 +1,22 @@
 <script lang="ts">
 	import { productsApi } from '$lib/api';
-	import type { ProductSelectType } from '$lib/types';
+	import type { PaginatedResponse, ProductSelectType } from '$lib/types';
 	import ProductCreate from './ProductCreate.svelte';
-
 	// Shared Components
-	import ListToolbar from '$lib/components/custom/shared-table/ListToolbar.svelte';
-	import ListPagination from '$lib/components/custom/shared-table/ListPagination.svelte';
 	import DataTable from '$lib/components/custom/shared-table/DataTable.svelte';
-
+	import ListPagination from '$lib/components/custom/shared-table/ListPagination.svelte';
+	import ListToolbar from '$lib/components/custom/shared-table/ListToolbar.svelte';
 	// UI Components
-	import * as Table from '$lib/components/ui/table';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import { MoreHorizontal, Package, Tag, Percent } from '@lucide/svelte';
+	import * as Table from '$lib/components/ui/table';
+	import { AsyncRequest } from '$lib/utils/asyncHandler.svelte';
+	import { MoreHorizontal, Package, Percent, Tag } from '@lucide/svelte';
 
 	// State
 	let products = $state<ProductSelectType[]>([]);
-	let loading = $state(false);
 
 	// Pagination & Search
 	let page = $state(1);
@@ -36,30 +34,23 @@
 		{ label: 'Actions', class: 'text-right' }
 	];
 
+	const productRequest = new AsyncRequest<PaginatedResponse<ProductSelectType>>();
 	async function loadProducts() {
-		loading = true;
-		try {
-			const res = await productsApi.list({
-				page,
-				size,
-				search: search || undefined
-			});
-			products = res.data;
-			total = res.total;
-		} catch (e) {
-			console.error('Failed to load products', e);
-		} finally {
-			loading = false;
-		}
+		await productRequest.call(productsApi.list({ page, size, search }), {
+			onSuccess: (res) => {
+				products = res.data;
+				total = res.total;
+			}
+		});
 	}
 
 	function handleProductCreated(newProduct: ProductSelectType) {
 		total += 1;
-	  if (page === 1) {
-	    products = [newProduct, ...products];
-	    if (products.length > size) products.pop();
-	  } else {
-	    page = 1;
+		if (page === 1) {
+			products = [newProduct, ...products];
+			if (products.length > size) products.pop();
+		} else {
+			page = 1;
 		}
 	}
 
@@ -86,7 +77,7 @@
 		</Card.Header>
 
 		<Card.Content>
-			<DataTable {loading} data={products} {columns}>
+			<DataTable loading={productRequest.loading} data={products} {columns}>
 				{#snippet row(product: ProductSelectType)}
 					<Table.Row>
 						<Table.Cell>
@@ -129,7 +120,7 @@
 
 						<Table.Cell>
 							<div class="flex items-center text-sm gap-2">
-                {product.tax_percent}
+								{product.tax_percent}
 								<Percent class="size-4 text-muted-foreground" />
 							</div>
 						</Table.Cell>
@@ -166,7 +157,7 @@
 
 		<Card.Footer>
 			<div class="w-full">
-				<ListPagination bind:page {size} {total} {loading} />
+				<ListPagination bind:page {size} {total} loading={productRequest.loading} />
 			</div>
 		</Card.Footer>
 	</Card.Root>

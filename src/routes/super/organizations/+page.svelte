@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { organizationsApi } from '$lib/api';
-	import type { OrganizationSelect } from '$lib/types';
+	import type { OrganizationSelect, PaginatedResponse } from '$lib/types';
+	import { AsyncRequest } from '$lib/utils/asyncHandler.svelte';
 	import OrganizationCreate from './OrganizationCreate.svelte';
-  
+
 	import DataTable from '$lib/components/custom/shared-table/DataTable.svelte';
 	import ListPagination from '$lib/components/custom/shared-table/ListPagination.svelte';
 	import ListToolbar from '$lib/components/custom/shared-table/ListToolbar.svelte';
-  
+
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
@@ -15,7 +16,6 @@
 	import { Banknote, Building2, Globe, MoreHorizontal } from '@lucide/svelte';
 
 	let organizations = $state<OrganizationSelect[]>([]);
-	let loading = $state(false);
 	let page = $state(1);
 	let size = $state(10);
 	let total = $state(0);
@@ -29,17 +29,15 @@
 		{ label: 'Actions', class: 'text-right' }
 	];
 
+	const orgRequest = new AsyncRequest<PaginatedResponse<OrganizationSelect>>();
 	async function loadOrgs() {
-		loading = true;
-		try {
-			const res = await organizationsApi.list({ page, size, search: search || undefined });
-			organizations = res.data;
-			total = res.total;
-		} catch (e) {
-			console.error(e);
-		} finally {
-			loading = false;
-		}
+		await orgRequest.call(organizationsApi.list({ page, size, search }), {
+			onSuccess: (res) => {
+				organizations = res.data;
+				total = res.total;
+			},
+			showToast: false
+		});
 	}
 
 	function handleCreated(newOrg: OrganizationSelect) {
@@ -71,7 +69,7 @@
 		</Card.Header>
 
 		<Card.Content>
-			<DataTable {loading} data={organizations} {columns}>
+			<DataTable loading={orgRequest.loading} data={organizations} {columns}>
 				{#snippet row(org: OrganizationSelect)}
 					<Table.Row>
 						<Table.Cell>
@@ -128,7 +126,7 @@
 
 		<Card.Footer>
 			<div class="w-full">
-				<ListPagination bind:page {size} {total} {loading} />
+				<ListPagination bind:page {size} {total} loading={orgRequest.loading} />
 			</div>
 		</Card.Footer>
 	</Card.Root>

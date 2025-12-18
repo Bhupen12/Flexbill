@@ -12,12 +12,11 @@
 	import * as Card from '$lib/components/ui/card';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import * as Table from '$lib/components/ui/table';
+	import { AsyncRequest } from '$lib/utils/asyncHandler.svelte';
 	import { MoreHorizontal } from '@lucide/svelte';
-	import { toast } from 'svelte-sonner';
 
 	// State
 	let users = $state<UserSelectType[]>([]);
-	let loading = $state(false);
 	let page = $state(1);
 	let size = $state(10);
 	let total = $state(0);
@@ -32,27 +31,23 @@
 		{ label: 'Actions', class: 'text-right' }
 	];
 
+	const userRequest = new AsyncRequest<any>();
 	async function loadUsers() {
-		loading = true;
-		try {
-			const res = await usersApi.list({ page, size, search: search || undefined });
-			users = res.data;
-			total = res.total;
-		} catch (e) {
-			console.error(e);
-			toast.error("Unable to load users list");
-		} finally {
-			loading = false;
-		}
+		await userRequest.call(usersApi.list({ page, size, search }), {
+			onSuccess: (res) => {
+				users = res.data;
+				total = res.total;
+			}
+		});
 	}
 
 	function handleUserCreated(newUserData: UserSelectType) {
 		total += 1;
-	  if (page === 1) {
-	    users = [newUserData, ...users];
-	    if (users.length > size) users.pop();
-	  } else {
-	    page = 1;
+		if (page === 1) {
+			users = [newUserData, ...users];
+			if (users.length > size) users.pop();
+		} else {
+			page = 1;
 		}
 	}
 
@@ -79,7 +74,7 @@
 		</Card.Header>
 
 		<Card.Content>
-			<DataTable {loading} data={users} {columns}>
+			<DataTable loading={userRequest.loading} data={users} {columns}>
 				{#snippet row(user: UserSelectType)}
 					<Table.Row>
 						<Table.Cell class="font-mono text-xs text-muted-foreground">
@@ -125,7 +120,7 @@
 
 		<Card.Footer>
 			<div class="w-full">
-				<ListPagination bind:page {size} {total} {loading} />
+				<ListPagination bind:page {size} {total} loading={userRequest.loading} />
 			</div>
 		</Card.Footer>
 	</Card.Root>
