@@ -1,4 +1,4 @@
-import { error, json } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 import { supabaseAdmin } from '$lib/server/auth/admin';
@@ -14,12 +14,21 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   // AuthZ check
   const currentUser = requireAdminOrSuper(locals);
 
-  // Validate input (API schema → includes password)
-  const body = await request.json();
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ message: 'Invalid JSON body' }, { status: 400 });
+  }
+
   const parsed = userInsertSchema.safeParse(body);
 
   if (!parsed.success) {
-    throw error(400, 'Invalid input');
+    const { fieldErrors } = parsed.error.flatten();
+    return json({ 
+      message: 'Validation failed',
+      errors: fieldErrors
+    }, { status: 400 });
   }
 
   const {
@@ -35,10 +44,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     currentUser.role === ROLES.ADMIN &&
     (role !== ROLES.USER || organization_id !== currentUser.organization_id)
   ) {
-    throw error(403, 'Admin can only create users in their organization');
+    return json(
+      { message: 'Admin can only create users in their organization' }, 
+      { status: 403 }
+    );
   }
 
-  // Create auth user (Supabase)
   const { data: authData, error: authError } =
     await supabaseAdmin.auth.admin.createUser({
       email,
@@ -47,7 +58,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     });
 
   if (authError) {
-    throw error(400, authError.message);
+    return json(
+      { message: authError.message }, 
+      { status: 400 }
+    );
   }
 
   const authUid = authData.user.id;
@@ -73,12 +87,15 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     return json(createdUser, { status: 201 });
 
-  } catch (err) {
+  } catch (err: any) {
     console.error('User creation failed:', err);
 
     // Rollback auth user if DB insert fails
     await supabaseAdmin.auth.admin.deleteUser(authUid);
 
-    throw error(500, 'User creation failed');
+    return json(
+      { message: 'User creation failed. Please try again.' }, 
+      { status: 500 }
+    );
   }
 };
