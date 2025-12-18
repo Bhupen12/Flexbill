@@ -1,4 +1,4 @@
-import { PAGINATION } from '$lib/config/constants';
+import { PAGINATION } from '$lib/constants';
 
 export function resolvePagination(url: URL) {
   let page = Number(url.searchParams.get('page'));
