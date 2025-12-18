@@ -8,6 +8,13 @@
       "when": 1765805065812,
       "tag": "0000_charming_penance",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1766033845129,
+      "tag": "0001_common_liz_osborn",
+      "breakpoints": true
     }
   ]
 }
