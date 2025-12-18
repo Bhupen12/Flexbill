@@ -2,7 +2,7 @@ import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 import { supabaseAdmin } from '$lib/server/auth/admin';
-import { requireAdminOrSuper } from '$lib/server/auth/requireRole';
+import { requireAdminOrSuper } from '$lib/server/auth/userinfo';
 
 import { db } from '$lib/server/db';
 import { users } from '$lib/server/db/schema/users';
