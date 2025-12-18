@@ -33,18 +33,13 @@
   let newProduct = $state({ ...initialProduct });
 
   async function createProduct() {
-    // Basic Validation
     if (!newProduct.name) return;
 
     creating = true;
     try {
-      // API call
+      newProduct.tax_percent = newProduct.tax_percent.toString()
       const createdProduct = (await productsApi.create(newProduct)) as ProductSelectType;
-      
-      // Notify parent
       onCreated(createdProduct);
-
-      // Reset & Close
       open = false;
       newProduct = { ...initialProduct };
     } catch (e) {

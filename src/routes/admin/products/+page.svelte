@@ -54,9 +54,13 @@
 	}
 
 	function handleProductCreated(newProduct: ProductSelectType) {
-		products = [newProduct, ...products];
-		if (products.length > size) products.pop();
 		total += 1;
+	  if (page === 1) {
+	    products = [newProduct, ...products];
+	    if (products.length > size) products.pop();
+	  } else {
+	    page = 1;
+		}
 	}
 
 	$effect(() => {
@@ -124,9 +128,9 @@
 						</Table.Cell>
 
 						<Table.Cell>
-							<div class="flex items-center text-sm">
-								<Percent class="mr-1 h-3 w-3 text-muted-foreground" />
-								{product.tax_percent}%
+							<div class="flex items-center text-sm gap-2">
+                {product.tax_percent}
+								<Percent class="size-4 text-muted-foreground" />
 							</div>
 						</Table.Cell>
 
