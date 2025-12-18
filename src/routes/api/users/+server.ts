@@ -4,7 +4,7 @@ import { and, eq, ilike, sql } from "drizzle-orm";
 import { requireRole } from "$lib/server/auth/userinfo";
 import { db } from "$lib/server/db";
 import { users } from "$lib/server/db/schema";
-import { userSelectSchema } from "$lib/server/validation/users";
+import { userSelectSchema } from "$lib/server/validation";
 import { ROLES } from "$lib/types";
 import { resolvePagination } from "$lib/hooks/pagination";
 

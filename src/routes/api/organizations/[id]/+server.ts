@@ -7,7 +7,7 @@ import {
   type OrganizationUpdate,
   organizationSelectSchema,
   organizationUpdateSchema
-} from "$lib/server/validation/organizations";
+} from "$lib/server/validation";
 
 const respond = (data: unknown, status = 200) =>
   new Response(JSON.stringify(data), {

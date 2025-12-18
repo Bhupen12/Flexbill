@@ -1,6 +1,6 @@
 import { db } from "$lib/server/db";
 import { users } from "$lib/server/db/schema";
-import { userSelectSchema } from "$lib/server/validation/users";
+import { userSelectSchema } from "$lib/server/validation";
 import { error, json, type RequestHandler } from "@sveltejs/kit";
 import { and, eq } from "drizzle-orm";
 
