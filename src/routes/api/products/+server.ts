@@ -4,7 +4,7 @@ import { db } from "$lib/server/db";
 import { products } from "$lib/server/db/schema";
 import { productInsertSchema } from "$lib/server/validation";
 import { ROLES } from "$lib/types";
-import { error, json, type RequestHandler } from "@sveltejs/kit";
+import { json, type RequestHandler } from "@sveltejs/kit";
 import { and, eq, ilike, or, sql } from "drizzle-orm";
 
 export const GET: RequestHandler = async ({ url, locals }) => {
@@ -74,7 +74,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   try {
     requestData = await request.json();
   } catch {
-    throw error(400, 'Invalid JSON body');
+    return json({ message: 'Invalid JSON body' }, { status: 400 });
   }
 
   const productPayload = {
@@ -85,27 +85,31 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   const parsed = productInsertSchema.safeParse(productPayload);
 
   if (!parsed.success) {
-    return json({
-      success: false,
-      message: 'Validation failed',
-      errors: parsed.error.flatten().fieldErrors
-    }, { status: 400 });
+    const errorMessages = parsed.error.issues
+      .map(issue => `${issue.path.join('.')}: ${issue.message}`)
+      .join(' | ');
+
+    return json({ message: `Validation failed: ${errorMessages}` }, { status: 400 });
   }
 
   try {
     const result = await db.insert(products).values(parsed.data).returning();
 
     if (result.length === 0) {
-      throw error(500, 'Product creation failed unexpectedly.');
+      return json({ message: 'Product creation failed unexpectedly.' }, { status: 500 });
     }
 
     return json(result[0], { status: 201 });
 
-  } catch (err) {
+  } catch (err: any) {
     console.error('Database Insert Error:', err);
 
+    // Optional: Handle unique constraint violation (e.g. duplicate SKU)
+    if (err.code === '23505') {
+      return json({ message: 'A product with this SKU or Name already exists.' }, { status: 409 });
+    }
+
     return json({
-      success: false,
       message: 'Failed to save product to database.'
     }, { status: 500 });
   }
