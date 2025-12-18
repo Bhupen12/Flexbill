@@ -59,7 +59,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   }
 
   const { pathname } = event.url;
-  if (pathname.startsWith('/api')){
+  if (pathname.startsWith('/api/')){
     if(!event.locals.userProfile){
       return error(401, 'Unauthorized')
     }

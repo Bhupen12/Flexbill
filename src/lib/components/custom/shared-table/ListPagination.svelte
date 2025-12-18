@@ -15,7 +15,7 @@
   }>();
 
   const totalPages = $derived(Math.ceil(total / size));
-  const startRecord = $derived((page - 1) * size + 1);
+  const startRecord = $derived(total === 0 ? 0 : (page - 1) * size + 1);
   const endRecord = $derived(Math.min(page * size, total));
 </script>
 

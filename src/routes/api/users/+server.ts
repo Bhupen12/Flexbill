@@ -10,7 +10,7 @@ import { resolvePagination } from "$lib/hooks/pagination";
 
 export const GET: RequestHandler = async ({ url, locals }) => {
   const currentUser = requireRole(locals, [ROLES.SUPER_ADMIN, ROLES.ADMIN], {
-    sameOrganization: true
+    requireOrganization: true
   })
   const { page, size, offset } = resolvePagination(url);
 
@@ -50,7 +50,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
       .offset(offset),
 
     db
-      .select({ count: sql<number>`count(*)` })
+      .select({ count: sql<number>`count(*)::int` })
       .from(users)
       .where(whereCondition)
   ]);

@@ -18,8 +18,8 @@
 	const initialOrg = {
 		name: '',
 		code: '',
-		timezone: 'Asia/Kolkata', // Smart default
-		currency: 'INR' // Smart default
+		timezone: 'Asia/Kolkata',
+		currency: 'INR'
 	};
 
 	let newOrg = $state({ ...initialOrg });

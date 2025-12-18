@@ -4,7 +4,7 @@ import { ROLES } from '$lib/types';
 type AllowedRole = typeof ROLES[keyof typeof ROLES];
 
 interface RequireRoleOptions {
-  sameOrganization?: boolean;
+  requireOrganization?: boolean;
 }
 
 export function requireRole(
@@ -22,9 +22,9 @@ export function requireRole(
     throw error(403, 'Forbidden');
   }
 
-  if (options.sameOrganization) {
+  if (options.requireOrganization) {
     if (!user.organization_id) {
-      throw error(400, 'User has no organization');
+      throw error(403, 'User has no organization');
     }
   }
 

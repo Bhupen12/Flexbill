@@ -42,16 +42,20 @@
 			total = res.total;
 		} catch (e) {
 			console.error(e);
-			toast.error("Unable to load users list");
+			toast.error('Unable to load users list');
 		} finally {
 			loading = false;
 		}
 	}
 
 	function handleUserCreated(newUserData: UserSelectType) {
-		users = [newUserData, ...users];
-		if (users.length > size) users.pop();
 		total += 1;
+		if (page === 1) {
+	    users = [newUserData, ...users];
+	    if (users.length > size) users.pop();
+	  } else {
+	    page = 1;
+	  }
 	}
 
 	$effect(() => {
@@ -123,11 +127,15 @@
 									<DropdownMenu.Item onclick={() => navigator.clipboard.writeText(user.id)}>
 										Copy User ID
 									</DropdownMenu.Item>
-									<DropdownMenu.Item
-										onclick={() => navigator.clipboard.writeText(user.organization_id || '')}
-									>
-										Copy Org ID
-									</DropdownMenu.Item>
+									{#if user.organization_id}
+										<DropdownMenu.Item
+											onclick={() => navigator.clipboard.writeText(user.organization_id || '')}
+										>
+											Copy Org ID
+										</DropdownMenu.Item>
+									{:else}
+										<DropdownMenu.Item disabled>No Organization</DropdownMenu.Item>
+									{/if}
 									<DropdownMenu.Separator />
 									<DropdownMenu.Item class="text-destructive">Delete User</DropdownMenu.Item>
 								</DropdownMenu.Content>

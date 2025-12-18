@@ -13,6 +13,7 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import * as Table from '$lib/components/ui/table';
 	import { MoreHorizontal } from '@lucide/svelte';
+	import { toast } from 'svelte-sonner';
 
 	// State
 	let users = $state<UserSelectType[]>([]);
@@ -39,15 +40,20 @@
 			total = res.total;
 		} catch (e) {
 			console.error(e);
+			toast.error("Unable to load users list");
 		} finally {
 			loading = false;
 		}
 	}
 
 	function handleUserCreated(newUserData: UserSelectType) {
-		users = [newUserData, ...users];
-		if (users.length > size) users.pop();
 		total += 1;
+	  if (page === 1) {
+	    users = [newUserData, ...users];
+	    if (users.length > size) users.pop();
+	  } else {
+	    page = 1;
+		}
 	}
 
 	$effect(() => {

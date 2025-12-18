@@ -14,22 +14,22 @@ export const usersApi = {
     return apiFetch<UserSelectType>(`${base}/${id}`);
   },
 
-  create(data: UserInsertType) {
-    return apiFetch(`/api/admin/user`, {
+  create(data: UserInsertType): Promise<UserSelectType> {
+    return apiFetch<UserSelectType>(`/api/admin/user`, {
       method: 'POST',
       body: JSON.stringify(data),
     });
   },
 
-  update(id: string, data: UserUpdateType) {
-    return apiFetch(`${base}/${id}`, {
+  update(id: string, data: UserUpdateType): Promise<UserSelectType> {
+    return apiFetch<UserSelectType>(`${base}/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
   },
 
-  remove(id: string) {
-    return apiFetch(`${base}/${id}`, {
+  remove(id: string): Promise<void> {
+    return apiFetch<void>(`${base}/${id}`, {
       method: 'DELETE',
     });
   }
