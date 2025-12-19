@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { usersApi } from '$lib/api';
-	import UserCreateDialog from '$lib/components/custom/domains/users/UserCreateDialog.svelte';
+	import UserCreateDialog from '$lib/components/custom/users/UserCreateDialog.svelte';
 	import DataTable from '$lib/components/custom/shared-table/DataTable.svelte';
 	import ListPagination from '$lib/components/custom/shared-table/ListPagination.svelte';
 	import ListToolbar from '$lib/components/custom/shared-table/ListToolbar.svelte';

@@ -5,6 +5,8 @@
 	import { type OrganizationSelect, type UserSelectType } from '$lib/types';
 	import { cn } from '$lib/utils';
 	import { Check, ChevronsUpDown, Eye, EyeOff, Loader2 } from '@lucide/svelte';
+	import { isSuperAdmin, user } from '$lib/stores/user';
+	import DebouncedInput from '../DebouncedInput.svelte';
 
 	import { Button } from '$lib/components/ui/button';
 	import * as Command from '$lib/components/ui/command';
@@ -13,7 +15,6 @@
 	import { Label } from '$lib/components/ui/label';
 	import * as Popover from '$lib/components/ui/popover';
 	import * as Select from '$lib/components/ui/select';
-	import { isSuperAdmin, user } from '$lib/stores/user';
 
 	// Props
 	let { onCreated } = $props<{
@@ -140,7 +141,15 @@
 						</Popover.Trigger>
 						<Popover.Content class="w-115 p-0" align="start">
 							<Command.Root shouldFilter={false}>
-								<Command.Input placeholder="Search organization..." bind:value={orgSearch} />
+								<div class="border-b border-border px-1 py-1">
+									<DebouncedInput
+										placeholder="Search organization..."
+										bind:value={orgSearch}
+										debounce={500}
+										class="w-full max-w-none" 
+										inputClass="border-none shadow-none focus-visible:ring-0 h-9"
+									/>
+								</div>
 								<Command.List>
 									{#if orgLoading}
 										<div class="p-4 text-center text-sm text-muted-foreground">Loading...</div>
