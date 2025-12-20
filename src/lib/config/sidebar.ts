@@ -2,6 +2,7 @@ import { ROLES, type Role } from '$lib/types';
 import {
   Building2Icon,
   Layers2Icon,
+  LayoutGridIcon,
   ShieldIcon,
   type IconProps
 } from '@lucide/svelte';
@@ -14,47 +15,68 @@ type SidebarItem = {
   icon: Component<IconProps, object, "">;
 };
 
-export type ManuItems = {
+type GroupItems = {
   title: string,
   items: SidebarItem[]
 }
 
-export const SIDEBAR_BY_ROLE: Partial<Record<Role, ManuItems[]>> = {
-  [ROLES.SUPER_ADMIN]: [
-    {
-      title: "Organizations",
-      items: [
-        {
-          title: 'Organizations',
-          url: '/super/organizations',
-          icon: Building2Icon
-        },
-        {
-          title: 'Platform Users',
-          url: '/super/users',
-          icon: ShieldIcon
-        }
-      ]
-    }
-  ],
+export type MenuItem = {
+  home: string,
+  groups: GroupItems[]
+}
 
-  [ROLES.ADMIN]: [
-    {
-      title: "Organization",
-      items: [
-        {
-          title: "Users",
-          url: "/admin/users",
-          icon: ShieldIcon
-        },
-        {
-          title: "Products",
-          url: "/admin/products",
-          icon: Layers2Icon
-        }
-      ]
-    }
-  ],
+export const SIDEBAR_BY_ROLE: Partial<Record<Role, MenuItem>> = {
+  [ROLES.SUPER_ADMIN]: {
+    home: "/super/dashboard",
+    groups: [
+      {
+        title: "Organizations",
+        items: [
+          {
+            title: 'DashBoard',
+            url: '/super/dashboard',
+            icon: LayoutGridIcon
+          },
+          {
+            title: 'Organizations',
+            url: '/super/organizations',
+            icon: Building2Icon
+          },
+          {
+            title: 'Platform Users',
+            url: '/super/users',
+            icon: ShieldIcon
+          }
+        ]
+      }
+    ]
+  },
+
+  [ROLES.ADMIN]: {
+    home: "/admin/dashboard",
+    groups: [
+      {
+        title: "Organization",
+        items: [
+          {
+            title: "DashBoard",
+            url: "/admin/dashboard",
+            icon: ShieldIcon
+          },
+          {
+            title: "Users",
+            url: "/admin/users",
+            icon: ShieldIcon
+          },
+          {
+            title: "Products",
+            url: "/admin/products",
+            icon: Layers2Icon
+          }
+        ]
+      }
+    ]
+  },
 
   // [ROLES.USER]: [
   //   {
