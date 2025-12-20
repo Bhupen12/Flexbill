@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { productsApi } from '$lib/api';
 	import type { ProductSelectType } from '$lib/types';
-	import { Loader2 } from '@lucide/svelte';
 // UI Components
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
+	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { user } from '$lib/stores/user';
 	import { AsyncRequest } from '$lib/utils/asyncHandler.svelte';
@@ -109,7 +109,7 @@
 			>
 			<Button disabled={productRequest.loading} onclick={createProduct}>
 				{#if productRequest.loading}
-					<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+					<Spinner />
 				{/if}
 				{productRequest.loading ? 'Saving...' : 'Save Product'}
 			</Button>

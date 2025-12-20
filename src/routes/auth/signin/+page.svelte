@@ -6,7 +6,8 @@
 	import * as Card from '$lib/components/ui/card';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
-	import { Eye, EyeOff, Loader2, LockKeyhole } from '@lucide/svelte';
+	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
+	import { Eye, EyeOff, LockKeyhole } from '@lucide/svelte';
 	import { toast } from 'svelte-sonner';
 
 	let loading = $state(false);
@@ -94,7 +95,7 @@
 
 				<Button type="submit" class="w-full" disabled={loading}>
 					{#if loading}
-						<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+						<Spinner />
 						Signing in...
 					{:else}
 						Sign In

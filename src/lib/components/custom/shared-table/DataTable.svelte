@@ -1,7 +1,8 @@
 <script lang="ts" generics="T">
-  import * as Table from '$lib/components/ui/table';
-  import { Loader2, Inbox } from '@lucide/svelte';
-  import type { Snippet } from 'svelte';
+	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
+	import * as Table from '$lib/components/ui/table';
+	import { Inbox } from '@lucide/svelte';
+	import type { Snippet } from 'svelte';
 
   let { 
     loading, 
@@ -31,7 +32,7 @@
         <Table.Row>
           <Table.Cell colspan={columns.length} class="h-24 text-center">
             <div class="flex items-center justify-center text-muted-foreground">
-              <Loader2 class="mr-2 h-4 w-4 animate-spin" /> Loading data...
+              <Spinner /> Loading data...
             </div>
           </Table.Cell>
         </Table.Row>

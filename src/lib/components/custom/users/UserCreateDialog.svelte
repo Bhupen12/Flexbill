@@ -2,10 +2,10 @@
 	import { toast } from 'svelte-sonner';
 
 	import { organizationsApi, usersApi } from '$lib/api';
+	import { isSuperAdmin, user } from '$lib/stores/user';
 	import { type OrganizationSelect, type UserSelectType } from '$lib/types';
 	import { cn } from '$lib/utils';
-	import { Check, ChevronsUpDown, Eye, EyeOff, Loader2 } from '@lucide/svelte';
-	import { isSuperAdmin, user } from '$lib/stores/user';
+	import { Check, ChevronsUpDown, Eye, EyeOff } from '@lucide/svelte';
 	import DebouncedInput from '../DebouncedInput.svelte';
 
 	import { Button } from '$lib/components/ui/button';
@@ -15,6 +15,7 @@
 	import { Label } from '$lib/components/ui/label';
 	import * as Popover from '$lib/components/ui/popover';
 	import * as Select from '$lib/components/ui/select';
+	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
 
 	// Props
 	let { onCreated } = $props<{
@@ -242,7 +243,7 @@
 			<Button variant="outline" onclick={() => (open = false)} disabled={creating}>Cancel</Button>
 			<Button disabled={creating} onclick={createUser}>
 				{#if creating}
-					<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+					<Spinner />
 				{/if}
 				Create User
 			</Button>

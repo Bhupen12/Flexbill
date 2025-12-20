@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { organizationsApi } from '$lib/api';
-	import type { OrganizationSelect } from '$lib/types';
-	import { Loader2 } from '@lucide/svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
+	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
+	import type { OrganizationSelect } from '$lib/types';
 	import { AsyncRequest } from '$lib/utils/asyncHandler.svelte';
 
 	let { onCreated } = $props<{
@@ -83,7 +83,7 @@
 			>
 			<Button disabled={orgRequest.loading} onclick={createOrganization}>
 				{#if orgRequest.loading}
-					<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+					<Spinner />
 				{/if}
 				{orgRequest.loading ? 'Creating...' : 'Create Organization'}
 			</Button>
