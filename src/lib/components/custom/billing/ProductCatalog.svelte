@@ -10,6 +10,7 @@
 	import { InboxIcon, ScanBarcode, Package, Tag, Search, Inbox } from '@lucide/svelte';
 	import DebouncedInput from '$lib/components/custom/DebouncedInput.svelte';
 	import { globalCart } from '$lib/stores/cart.svelte';
+	import { toast } from 'svelte-sonner';
 
 	let products = $state<ProductSelectType[]>([]);
 	let loading = $state<boolean>(false);
@@ -23,6 +24,10 @@
 		await productRequest.call(productsApi.list({ size, search }), {
 			onSuccess: (res) => {
 				products = res.data;
+			},
+			onError: (err) => {
+				products = [];
+				toast.error('Failed to load products');
 			}
 		});
 		loading = false;
