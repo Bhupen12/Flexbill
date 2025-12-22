@@ -32,6 +32,14 @@
 		globalCart.add(product);
 	}
 
+	function formatCurrency(amount: number) {
+		return new Intl.NumberFormat('en-IN', {
+			style: 'currency',
+			currency: 'INR',
+			maximumFractionDigits: 0
+		}).format(amount || 0);
+	}
+
 	$effect(() => {
 		searchProduct();
 	});
@@ -109,12 +117,15 @@
 							</div>
 						</div>
 
-						<div class="flex items-center justify-between gap-2 border-t pt-2">
-							<span
-								class="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-600"
-							>
-								{product.unit}
-							</span>
+						<div class="flex items-center justify-between gap-2 border-t pt-3 mt-auto">
+							<div class="baseline text-slate-900">
+								<span class="text-sm font-bold">
+									{formatCurrency(Number(product.base_price))}
+								</span>
+								<span class="text-xs text-muted-foreground font-medium">
+									/ {product.unit}
+								</span>
+							</div>
 
 							<Button
 								size="sm"
