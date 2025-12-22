@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
 	import { organizationsApi, usersApi } from '$lib/api';
-	import { isSuperAdmin, user } from '$lib/stores/user';
+	import { isSuperAdmin, user } from '$lib/stores/user.svelte';
 	import { type OrganizationSelect, type UserSelectType } from '$lib/types';
 	import { cn } from '$lib/utils';
 	import DebouncedInput from '../DebouncedInput.svelte';

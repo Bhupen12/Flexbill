@@ -9,6 +9,7 @@
 	import { AsyncRequest } from '$lib/utils/asyncHandler.svelte';
 	import { InboxIcon, ScanBarcode, Package, Tag, Search, Inbox } from '@lucide/svelte';
 	import DebouncedInput from '$lib/components/custom/DebouncedInput.svelte';
+	import { globalCart } from '$lib/stores/cart.svelte';
 
 	let products = $state<ProductSelectType[]>([]);
 	let loading = $state<boolean>(false);
@@ -25,6 +26,10 @@
 			}
 		});
 		loading = false;
+	}
+
+	function addToCart(product: ProductSelectType) {
+		globalCart.add(product);
 	}
 
 	$effect(() => {
@@ -115,6 +120,9 @@
 								size="sm"
 								variant="secondary"
 								class="h-7 px-3 text-xs font-medium hover:bg-slate-200"
+								onclick={() => {
+									addToCart(product);
+								}}
 							>
 								Add
 							</Button>
