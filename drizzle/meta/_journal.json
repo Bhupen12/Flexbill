@@ -15,6 +15,13 @@
       "when": 1766033845129,
       "tag": "0001_common_liz_osborn",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1766403043746,
+      "tag": "0002_brainy_pet_avengers",
+      "breakpoints": true
     }
   ]
 }
