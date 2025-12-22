@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Input } from '$lib/components/ui/input';
-	import { Search } from '@lucide/svelte';
+	import * as InputGroup from '$lib/components/ui/input-group';
+	import { SearchIcon } from '@lucide/svelte';
 	import { cn } from '$lib/utils';
 	import { untrack } from 'svelte';
 	import type { HTMLInputAttributes } from 'svelte/elements';
@@ -66,15 +66,15 @@
 	}
 </script>
 
-<div class={cn('relative w-full max-w-sm', className)}>
-	<Search class="text-muted-foreground absolute left-2.5 top-2.5 h-4 w-4 select-none pointer-events-none" />
-	
-	<Input
-		type="search"
+<InputGroup.Root>
+	<InputGroup.Input
 		{placeholder}
-		class={cn('pl-9', inputClass)}
+		class={cn(inputClass)}
 		bind:value={internalValue}
 		oninput={handleInput}
 		{...restProps}
 	/>
-</div>
+	<InputGroup.Addon>
+		<SearchIcon />
+	</InputGroup.Addon>
+</InputGroup.Root>

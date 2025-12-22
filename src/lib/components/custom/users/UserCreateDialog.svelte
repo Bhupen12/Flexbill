@@ -1,23 +1,35 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
-
 	import { organizationsApi, usersApi } from '$lib/api';
 	import { isSuperAdmin, user } from '$lib/stores/user';
 	import { type OrganizationSelect, type UserSelectType } from '$lib/types';
 	import { cn } from '$lib/utils';
-	import { Check, ChevronsUpDown, Eye, EyeOff } from '@lucide/svelte';
 	import DebouncedInput from '../DebouncedInput.svelte';
 
+	// UI Components
 	import { Button } from '$lib/components/ui/button';
 	import * as Command from '$lib/components/ui/command';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
-	import * as Popover from '$lib/components/ui/popover';
 	import * as Select from '$lib/components/ui/select';
+	import * as Popover from '$lib/components/ui/popover';
+	import * as InputGroup from '$lib/components/ui/input-group';
+	import * as Field from '$lib/components/ui/field';
 	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
 
-	// Props
+	// Icons
+	import {
+		Check,
+		ChevronsUpDown,
+		Eye,
+		EyeOff,
+		Building2,
+		User,
+		Mail,
+		Phone,
+		Lock,
+		Shield
+	} from '@lucide/svelte';
+
 	let { onCreated } = $props<{
 		onCreated: (user: UserSelectType) => void;
 	}>();
@@ -94,9 +106,7 @@
 		creating = true;
 		try {
 			const newUserData = (await usersApi.create(newUser)) as UserSelectType;
-
 			toast.success(`User ${newUserData.full_name || 'Created'} successfully!`);
-
 			onCreated(newUserData);
 			open = false;
 		} catch (e: any) {
@@ -115,135 +125,201 @@
 		<Button>Create User</Button>
 	</Dialog.Trigger>
 
-	<Dialog.Content class="sm:max-w-125">
+	<Dialog.Content class="sm:max-w-3xl">
 		<Dialog.Header>
 			<Dialog.Title>Add New User</Dialog.Title>
-			<Dialog.Description>Fill in the details to invite a new user.</Dialog.Description>
+			<Dialog.Description>Configure access and user details.</Dialog.Description>
 		</Dialog.Header>
 
-		<div class="grid gap-6 py-4">
-			{#if $isSuperAdmin}
-				<div class="grid gap-2">
-					<Label class="text-foreground/80">Organization</Label>
-					<Popover.Root bind:open={orgOpen}>
-						<Popover.Trigger>
-							{#snippet child({ props })}
-								<Button
-									variant="outline"
-									role="combobox"
-									aria-expanded={orgOpen}
-									class="w-full justify-between bg-muted/50 font-normal"
-									{...props}
-								>
-									{newUser.organization_id ? selectedOrgName : 'Select organization...'}
-									<ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
-								</Button>
-							{/snippet}
-						</Popover.Trigger>
-						<Popover.Content class="w-115 p-0" align="start">
-							<Command.Root shouldFilter={false}>
-								<div class="border-b border-border px-1 py-1">
-									<DebouncedInput
-										placeholder="Search organization..."
-										bind:value={orgSearch}
-										debounce={500}
-										class="w-full max-w-none" 
-										inputClass="border-none shadow-none focus-visible:ring-0 h-9"
-									/>
-								</div>
-								<Command.List>
-									{#if orgLoading}
-										<div class="p-4 text-center text-sm text-muted-foreground">Loading...</div>
-									{:else if orgOptions.length === 0}
-										<Command.Empty>No organization found.</Command.Empty>
-									{:else}
-										<Command.Group>
-											{#each orgOptions as org (org.id)}
-												<Command.Item
-													value={org.name}
-													onSelect={() => {
-														newUser.organization_id = org.id;
-														orgOpen = false;
-													}}
-												>
-													<Check
-														class={cn(
-															'mr-2 h-4 w-4',
-															newUser.organization_id === org.id ? 'opacity-100' : 'opacity-0'
-														)}
-													/>
-													{org.name}
-												</Command.Item>
-											{/each}
-										</Command.Group>
-									{/if}
-								</Command.List>
-							</Command.Root>
-						</Popover.Content>
-					</Popover.Root>
-				</div>
-			{/if}
-
-			<div class="grid gap-4">
-				<div class="grid grid-cols-2 gap-4">
-					<div class="grid gap-2">
-						<Label>Full Name</Label>
-						<Input bind:value={newUser.full_name} placeholder="e.g. John Doe" />
-					</div>
-					<div class="grid gap-2">
-						<Label>Role</Label>
-						<Select.Root type="single" bind:value={newUser.role}>
-							<Select.Trigger class="w-full">Select a role</Select.Trigger>
-							<Select.Content>
-								{#each roles as role}
-									<Select.Item value={role.value}>{role.label}</Select.Item>
-								{/each}
-							</Select.Content>
-						</Select.Root>
-					</div>
-				</div>
-
-				<div class="grid grid-cols-2 gap-4">
-					<div class="grid gap-2">
-						<Label>Email Address</Label>
-						<Input type="email" bind:value={newUser.email} placeholder="name@company.com" />
-					</div>
-					<div class="grid gap-2">
-						<Label>Phone Number</Label>
-						<Input bind:value={newUser.phone} placeholder="+91..." />
-					</div>
-				</div>
-
-				<div class="grid gap-2">
-					<Label>Password</Label>
-					<div class="relative">
-						<Input
-							type={showPassword ? 'text' : 'password'}
-							bind:value={newUser.password}
-							class="pr-10"
-						/>
-						<Button
-							variant="ghost"
-							size="icon"
-							class="absolute right-0 top-0 h-full px-3 py-2"
-							onclick={() => (showPassword = !showPassword)}
-						>
-							{#if showPassword}
-								<EyeOff class="h-4 w-4 text-muted-foreground" />
-							{:else}
-								<Eye class="h-4 w-4 text-muted-foreground" />
+		<div class="py-4">
+			<Field.Group>
+				<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+					
+					<Field.Set>
+						<Field.Legend>Access & Credentials</Field.Legend>
+						<div class="grid gap-4">
+							
+							{#if $isSuperAdmin}
+								<Field.Field>
+									<Field.Label>Organization</Field.Label>
+									<div class="relative">
+										<Popover.Root bind:open={orgOpen}>
+											<Popover.Trigger>
+												{#snippet child({ props })}
+													<Button
+														variant="outline"
+														role="combobox"
+														aria-expanded={orgOpen}
+														class="w-full justify-between bg-background px-3 font-normal"
+														{...props}
+													>
+														<div class="flex items-center gap-2">
+															<Building2 class="text-muted-foreground size-4" />
+															<span class="truncate">
+																{newUser.organization_id
+																	? selectedOrgName
+																	: 'Select organization...'}
+															</span>
+														</div>
+														<ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
+													</Button>
+												{/snippet}
+											</Popover.Trigger>
+											<Popover.Content class="w-80 p-0" align="start">
+												<Command.Root shouldFilter={false}>
+													<div class="border-border border-b px-1 py-1">
+														<DebouncedInput
+															placeholder="Search organization..."
+															bind:value={orgSearch}
+															debounce={500}
+															class="w-full max-w-none"
+															inputClass="border-none shadow-none focus-visible:ring-0 h-9"
+														/>
+													</div>
+													<Command.List>
+														{#if orgLoading}
+															<div class="text-muted-foreground p-4 text-center text-sm">
+																Loading...
+															</div>
+														{:else if orgOptions.length === 0}
+															<Command.Empty>No organization found.</Command.Empty>
+														{:else}
+															<Command.Group>
+																{#each orgOptions as org (org.id)}
+																	<Command.Item
+																		value={org.name}
+																		onSelect={() => {
+																			newUser.organization_id = org.id;
+																			orgOpen = false;
+																		}}
+																	>
+																		<Check
+																			class={cn(
+																				'mr-2 h-4 w-4',
+																				newUser.organization_id === org.id
+																					? 'opacity-100'
+																					: 'opacity-0'
+																			)}
+																		/>
+																		{org.name}
+																	</Command.Item>
+																{/each}
+															</Command.Group>
+														{/if}
+													</Command.List>
+												</Command.Root>
+											</Popover.Content>
+										</Popover.Root>
+									</div>
+								</Field.Field>
 							{/if}
-						</Button>
-					</div>
+
+							<Field.Field>
+								<Field.Label>Role</Field.Label>
+								<Select.Root type="single" bind:value={newUser.role}>
+									<Select.Trigger class="w-full pl-3">
+										<div class="flex items-center gap-2">
+											<Shield class="text-muted-foreground size-4" />
+											<span>
+												{roles.find((r) => r.value === newUser.role)?.label ??
+													'Select Role'}
+											</span>
+										</div>
+									</Select.Trigger>
+									<Select.Content>
+										{#each roles as role}
+											<Select.Item value={role.value}>{role.label}</Select.Item>
+										{/each}
+									</Select.Content>
+								</Select.Root>
+							</Field.Field>
+
+							<Field.Field>
+								<Field.Label>Password</Field.Label>
+								<InputGroup.Root>
+									<InputGroup.Addon>
+										<Lock class="size-4" />
+									</InputGroup.Addon>
+									<InputGroup.Input
+										type={showPassword ? 'text' : 'password'}
+										bind:value={newUser.password}
+										placeholder="••••••••"
+									/>
+									<InputGroup.Addon>
+										<InputGroup.Button
+											variant="ghost"
+											size="icon-xs"
+											onclick={() => (showPassword = !showPassword)}
+										>
+											{#if showPassword}
+												<EyeOff class="h-4 w-4" />
+											{:else}
+												<Eye class="h-4 w-4" />
+											{/if}
+										</InputGroup.Button>
+									</InputGroup.Addon>
+								</InputGroup.Root>
+							</Field.Field>
+
+						</div>
+					</Field.Set>
+
+					<Field.Set>
+						<Field.Legend>Personal Details</Field.Legend>
+						<div class="grid gap-4">
+							<Field.Field>
+								<Field.Label>Full Name</Field.Label>
+								<InputGroup.Root>
+									<InputGroup.Addon>
+										<User class="size-4" />
+									</InputGroup.Addon>
+									<InputGroup.Input
+										bind:value={newUser.full_name}
+										placeholder="e.g. John Doe"
+									/>
+								</InputGroup.Root>
+							</Field.Field>
+
+							<Field.Field>
+								<Field.Label>Email Address</Field.Label>
+								<InputGroup.Root>
+									<InputGroup.Addon>
+										<Mail class="size-4" />
+									</InputGroup.Addon>
+									<InputGroup.Input
+										type="email"
+										bind:value={newUser.email}
+										placeholder="name@company.com"
+									/>
+								</InputGroup.Root>
+							</Field.Field>
+
+							<Field.Field>
+								<Field.Label>Phone Number</Field.Label>
+								<InputGroup.Root>
+									<InputGroup.Addon>
+										<Phone class="size-4" />
+									</InputGroup.Addon>
+									<InputGroup.Input
+										bind:value={newUser.phone}
+										placeholder="+91..."
+									/>
+								</InputGroup.Root>
+							</Field.Field>
+						</div>
+					</Field.Set>
+
 				</div>
-			</div>
+			</Field.Group>
 		</div>
 
 		<Dialog.Footer>
-			<Button variant="outline" onclick={() => (open = false)} disabled={creating}>Cancel</Button>
+			<Button variant="outline" onclick={() => (open = false)} disabled={creating}>
+				Cancel
+			</Button>
 			<Button disabled={creating} onclick={createUser}>
 				{#if creating}
-					<Spinner />
+					<Spinner class="mr-2 h-4 w-4" />
 				{/if}
 				Create User
 			</Button>

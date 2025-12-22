@@ -78,16 +78,24 @@ export const SIDEBAR_BY_ROLE: Partial<Record<Role, MenuItem>> = {
     ]
   },
 
-  // [ROLES.USER]: [
-  //   {
-  //     title: 'Billing',
-  //     url: '/app/billing',
-  //     icon: ReceiptIcon
-  //   },
-  //   {
-  //     title: 'Customers',
-  //     url: '/app/customers',
-  //     icon: UserIcon
-  //   }
-  // ]
+  [ROLES.USER]: {
+    home: "/org/billing",
+    groups: [
+      {
+        title: "Billing",
+        items: [
+          {
+            title: "Billing",
+            url: "/org/billing",
+            icon: ShieldIcon
+          },
+          {
+            title: "History",
+            url: "/org/history",
+            icon: ShieldIcon
+          },
+        ]
+      }
+    ]
+  }
 };

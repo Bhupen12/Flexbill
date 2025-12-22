@@ -27,7 +27,6 @@
 	</div>
 
 	<div class="flex items-center gap-2">
-		<span class="text-sm text-muted-foreground whitespace-nowrap">Rows per page</span>
 		<Select.Root
 			type="single"
 			value={String(size)}

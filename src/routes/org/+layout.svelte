@@ -7,9 +7,9 @@
 
 <Sidebar.Provider>
 	<AppSidebar />
-	<Sidebar.Inset class="bg-accent/70">
-		<main>
-			<Sidebar.Trigger />
+	<Sidebar.Inset class="bg-accent/70 h-screen flex flex-col">
+		<Sidebar.Trigger />
+		<main class="flex-1 md:overflow-hidden">
 			{@render children?.()}
 		</main>
 	</Sidebar.Inset>
