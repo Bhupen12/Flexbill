@@ -8,6 +8,7 @@ export const products = pgTable('products', {
   name: text('name').notNull(),
   description: text('description'),
   unit: text('unit').default('pc').notNull(),
+  base_price: numeric('base_price', { precision: 5, scale: 2 }).default('0').notNull(),
   tax_percent: numeric('tax_percent', { precision: 5, scale: 2 }).default('0').notNull(),
   is_active: boolean('is_active').default(true).notNull(),
   created_at: timestamp('created_at').defaultNow().notNull(),

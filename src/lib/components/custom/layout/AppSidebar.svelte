@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import { SIDEBAR_BY_ROLE } from '$lib/config/sidebar';
-	import { user } from '$lib/stores/user';
+	import { user } from '$lib/stores/user.svelte';
 	import { ROLES } from '$lib/types';
 	import { LogOutIcon, ReceiptIcon } from '@lucide/svelte';
 

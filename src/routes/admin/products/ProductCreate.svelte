@@ -8,7 +8,7 @@
 	import { Label } from '$lib/components/ui/label';
 	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
 	import { Textarea } from '$lib/components/ui/textarea';
-	import { user } from '$lib/stores/user';
+	import { user } from '$lib/stores/user.svelte';
 	import { AsyncRequest } from '$lib/utils/asyncHandler.svelte';
 
 	// Props
